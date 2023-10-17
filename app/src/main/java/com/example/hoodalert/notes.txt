@@ -1,0 +1,4 @@
+Notities
+ - Modifier argument geeft je de optie om later een style wijziging door te geven zonder dat je deze
+ methode hoeft aan te passen
+  * https://developer.android.com/codelabs/basic-android-kotlin-compose-build-a-dice-roller-app#2
