@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import com.example.hoodalert.data.model.Incident
 import com.example.hoodalert.data.repository.IncidentsRepository
 import java.text.NumberFormat
+import java.util.Date
 
 class IncidentEntryViewModel(private val incidentsRepository: IncidentsRepository) : ViewModel() {
     var incidentUiState by mutableStateOf(IncidentUiState())
@@ -26,7 +27,7 @@ class IncidentEntryViewModel(private val incidentsRepository: IncidentsRepositor
 
     private fun validateInput(uiState: IncidentDetails = incidentUiState.incidentDetails): Boolean {
         return with(uiState) {
-            name.isNotBlank() && price.isNotBlank() && quantity.isNotBlank()
+            title.isNotBlank() && description.isNotBlank()
         }
     }
 }
@@ -38,21 +39,20 @@ data class IncidentUiState(
 
 data class IncidentDetails(
     val id: Int = 0,
-    val name: String = "",
-    val price: String = "",
-    val quantity: String = "",
+    val title: String = "",
+    val description: String = "",
 )
 
 fun IncidentDetails.toIncident(): Incident = Incident(
     id = id,
-    name = name,
-    price = price.toDoubleOrNull() ?: 0.0,
-    quantity = quantity.toIntOrNull() ?: 0
+    userId = 1,
+    title = title,
+    description = description,
+    latitude = null,
+    longitude = null,
+    createdAt = Date(),
+    updatedAt = Date()
 )
-
-fun Incident.formatedPrice(): String {
-    return NumberFormat.getCurrencyInstance().format(price)
-}
 
 fun Incident.toIncidentUiState(isEntryValid: Boolean = false): IncidentUiState = IncidentUiState(
     incidentDetails = this.toIncidentDetails(),
@@ -61,7 +61,6 @@ fun Incident.toIncidentUiState(isEntryValid: Boolean = false): IncidentUiState =
 
 fun Incident.toIncidentDetails(): IncidentDetails = IncidentDetails(
     id = id,
-    name = name,
-    price = price.toString(),
-    quantity = quantity.toString()
+    title = title,
+    description = description
 )

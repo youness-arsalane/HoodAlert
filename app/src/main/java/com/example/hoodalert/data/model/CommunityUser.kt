@@ -7,38 +7,37 @@ import androidx.room.PrimaryKey
 import java.util.Date
 
 @Entity(
-    tableName = "incidents",
+    tableName = "community_users",
     foreignKeys = [
+        ForeignKey(
+            entity = Community::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("community_id"),
+            onUpdate = ForeignKey.CASCADE,
+            onDelete = ForeignKey.CASCADE
+        ),
         ForeignKey(
             entity = User::class,
             parentColumns = arrayOf("id"),
             childColumns = arrayOf("user_id"),
             onUpdate = ForeignKey.CASCADE,
-            onDelete = ForeignKey.RESTRICT
+            onDelete = ForeignKey.CASCADE
         )
     ]
 )
-data class Incident(
-    @PrimaryKey val id: Int,
+data class CommunityUser(
+    @PrimaryKey
+    val id: Int,
+
+    @ColumnInfo(name = "community_id")
+    val communityId: Int,
 
     @ColumnInfo(name = "user_id")
     val userId: Int,
-
-    @ColumnInfo(name = "title")
-    val title: String,
-
-    @ColumnInfo(name = "description")
-    val description: String,
-
-    @ColumnInfo(name = "latitude")
-    val latitude: Long?,
-
-    @ColumnInfo(name = "longitude")
-    val longitude: Long?,
 
     @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
     val createdAt: Date,
 
     @ColumnInfo(name = "updated_at", defaultValue = "CURRENT_TIMESTAMP")
-    val updatedAt: Date,
+    val updatedAt: Date
 )

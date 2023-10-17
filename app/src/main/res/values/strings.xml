@@ -11,6 +11,7 @@
     <string name="hide_password">Hide password</string>
     <string name="show_password">Show password</string>
     <string name="title">Title</string>
+    <string name="description">Description</string>
     <string name="incidents">Incidents</string>
     <string name="add_incident">Add incident</string>
 
@@ -28,9 +29,6 @@
     <string name="incident_price_req">Incident Price*</string>
     <string name="no">No</string>
     <string name="price">Price</string>
-    <string name="quantity_in_stock">Quantity in stock</string>
-    <string name="in_stock">%d in stock</string>
-    <string name="quantity_req">Quantity in Stock*</string>
     <string name="save_action">Save</string>
     <string name="sell">Sell</string>
     <string name="yes">Yes</string>

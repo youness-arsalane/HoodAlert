@@ -25,6 +25,7 @@ import androidx.navigation.NavController
 import com.example.hoodalert.MainActivity
 import com.example.hoodalert.R
 import com.example.hoodalert.ui.navigation.NavigationDestination
+import com.example.hoodalert.ui.screens.incidents.IncidentListDestination
 import com.example.hoodalert.ui.theme.HoodAlertTheme
 import com.example.hoodalert.util.supportWideScreen
 
@@ -52,7 +53,7 @@ fun DashboardScreen(
                 contentPadding = contentPadding
             ) {
                 item {
-                    Button(onClick = { navController.navigate(DashboardDestination.route) }) {
+                    Button(onClick = { navController.navigate(IncidentListDestination.route) }) {
                         Text(text = "Incidents")
                     }
                 }

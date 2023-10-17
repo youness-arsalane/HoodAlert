@@ -31,9 +31,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hoodalert.R
 import com.example.hoodalert.data.model.Incident
@@ -42,7 +42,6 @@ import com.example.hoodalert.ui.components.HoodAlertTopAppBar
 import com.example.hoodalert.ui.navigation.NavigationDestination
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentDetailsUiState
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentDetailsViewModel
-import com.example.hoodalert.ui.viewmodel.incidents.formatedPrice
 import com.example.hoodalert.ui.viewmodel.incidents.toIncident
 import kotlinx.coroutines.launch
 
@@ -74,7 +73,7 @@ fun DetailsScreen(
             FloatingActionButton(
                 onClick = { navigateToEditIncident(uiState.value.incidentDetails.id) },
                 shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
+                modifier = Modifier.padding(20.dp)
 
             ) {
                 Icon(
@@ -86,7 +85,7 @@ fun DetailsScreen(
     ) { innerPadding ->
         DetailsBody(
             incidentDetailsUiState = uiState.value,
-            onSellIncident = { viewModel.reduceQuantityByOne() },
+            onSellIncident = { },
             onDelete = {
                 coroutineScope.launch {
                     viewModel.deleteIncident()
@@ -108,8 +107,8 @@ private fun DetailsBody(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
+        modifier = modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
         Details(
@@ -137,7 +136,7 @@ private fun DetailsBody(
                     onDelete()
                 },
                 onDeleteCancel = { deleteConfirmationRequired = false },
-                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium))
+                modifier = Modifier.padding(16.dp)
             )
         }
     }
@@ -157,37 +156,21 @@ fun Details(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(id = R.dimen.padding_medium)),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             DetailsRow(
                 labelResID = R.string.incident,
-                incidentDetail = incident.name,
+                incidentDetail = incident.title,
                 modifier = Modifier.padding(
-                    horizontal = dimensionResource(
-                        id = R.dimen
-                            .padding_medium
-                    )
+                    horizontal = 16.dp
                 )
             )
             DetailsRow(
-                labelResID = R.string.quantity_in_stock,
-                incidentDetail = incident.quantity.toString(),
+                labelResID = R.string.description,
+                incidentDetail = incident.description,
                 modifier = Modifier.padding(
-                    horizontal = dimensionResource(
-                        id = R.dimen
-                            .padding_medium
-                    )
-                )
-            )
-            DetailsRow(
-                labelResID = R.string.price,
-                incidentDetail = incident.formatedPrice(),
-                modifier = Modifier.padding(
-                    horizontal = dimensionResource(
-                        id = R.dimen
-                            .padding_medium
-                    )
+                    horizontal = 16.dp
                 )
             )
         }

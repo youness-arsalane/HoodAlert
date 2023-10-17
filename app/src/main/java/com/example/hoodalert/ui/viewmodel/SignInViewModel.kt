@@ -1,26 +1,16 @@
 package com.example.hoodalert.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.example.hoodalert.data.repository.UserRepository
+import com.example.hoodalert.data.repository.UsersRepository
 
-class SignInViewModel(private val userRepository: UserRepository) : ViewModel() {
+class SignInViewModel(private val usersRepository: UsersRepository) : ViewModel() {
     fun signIn(
         email: String,
         password: String,
         onSignInComplete: () -> Unit,
     ) {
-        userRepository.signIn(email, password)
-        onSignInComplete()
-    }
-}
-
-class SignInViewModelFactory : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(SignInViewModel::class.java)) {
-            return SignInViewModel(UserRepository) as T
+        if (usersRepository.signIn(email, password)) {
+            onSignInComplete()
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

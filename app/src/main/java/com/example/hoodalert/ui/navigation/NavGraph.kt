@@ -8,10 +8,10 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.hoodalert.ui.navigation.route.SignInRoute
 import com.example.hoodalert.ui.screens.DashboardDestination
 import com.example.hoodalert.ui.screens.DashboardScreen
 import com.example.hoodalert.ui.screens.SignInDestination
+import com.example.hoodalert.ui.screens.SignInScreen
 import com.example.hoodalert.ui.screens.incidents.IncidentListDestination
 import com.example.hoodalert.ui.screens.incidents.ListScreen
 import com.example.hoodalert.ui.screens.incidents.IncidentDetailsDestination
@@ -28,14 +28,12 @@ fun HoodAlertNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = IncidentListDestination.route,
+        startDestination = SignInDestination.route,
         modifier = modifier
     ) {
         composable(route = SignInDestination.route) {
-            SignInRoute(
-                onSignInSubmitted = {
-                    navController.navigate(DashboardDestination.route)
-                }
+            SignInScreen(
+                onSignInSubmitted = { navController.navigate(DashboardDestination.route) }
             )
         }
 

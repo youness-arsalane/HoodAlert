@@ -28,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,7 +40,6 @@ import com.example.hoodalert.ui.components.HoodAlertTopAppBar
 import com.example.hoodalert.ui.navigation.NavigationDestination
 import com.example.hoodalert.ui.theme.HoodAlertTheme
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentListViewModel
-import com.example.hoodalert.ui.viewmodel.incidents.formatedPrice
 
 object IncidentListDestination : NavigationDestination {
     override val route = "incident_list"
@@ -73,7 +71,7 @@ fun ListScreen(
             FloatingActionButton(
                 onClick = navigateToIncidentEntry,
                 shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
+                modifier = Modifier.padding(20.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -110,7 +108,7 @@ private fun ListBody(
             HoodAlertList(
                 incidentList = incidentList,
                 onIncidentClick = { onIncidentClick(it.id) },
-                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
+                modifier = Modifier.padding(horizontal = 8.dp)
             )
         }
     }
@@ -124,7 +122,7 @@ private fun HoodAlertList(
         items(items = incidentList, key = { it.id }) { incident ->
             HoodAlertIncident(incident = incident,
                 modifier = Modifier
-                    .padding(dimensionResource(id = R.dimen.padding_small))
+                    .padding(8.dp)
                     .clickable { onIncidentClick(incident) })
         }
     }
@@ -138,39 +136,18 @@ private fun HoodAlertIncident(
         modifier = modifier, elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large)),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = incident.name,
+                    text = incident.title,
                     style = MaterialTheme.typography.titleLarge,
                 )
-                Spacer(Modifier.weight(1f))
-                Text(
-                    text = incident.formatedPrice(),
-                    style = MaterialTheme.typography.titleMedium
-                )
             }
-            Text(
-                text = stringResource(R.string.in_stock, incident.quantity),
-                style = MaterialTheme.typography.titleMedium
-            )
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ListBodyPreview() {
-    HoodAlertTheme {
-        ListBody(listOf(
-            Incident(1, "Game", 100.0, 20),
-            Incident(2, "Pen", 200.0, 30),
-            Incident(3, "TV", 300.0, 50)
-        ), onIncidentClick = {})
     }
 }
 
@@ -179,15 +156,5 @@ fun ListBodyPreview() {
 fun ListBodyEmptyListPreview() {
     HoodAlertTheme {
         ListBody(listOf(), onIncidentClick = {})
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HoodAlertIncidentPreview() {
-    HoodAlertTheme {
-        HoodAlertIncident(
-            Incident(1, "Game", 100.0, 20),
-        )
     }
 }

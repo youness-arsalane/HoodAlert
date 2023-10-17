@@ -23,21 +23,12 @@ class IncidentDetailsViewModel(
         incidentsRepository.getIncidentStream(incidentId)
             .filterNotNull()
             .map {
-                IncidentDetailsUiState(outOfStock = it.quantity <= 0, incidentDetails = it.toIncidentDetails())
+                IncidentDetailsUiState(incidentDetails = it.toIncidentDetails())
             }.stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = IncidentDetailsUiState()
             )
-
-    fun reduceQuantityByOne() {
-        viewModelScope.launch {
-            val currentIncident = uiState.value.incidentDetails.toIncident()
-            if (currentIncident.quantity > 0) {
-                incidentsRepository.updateIncident(currentIncident.copy(quantity = currentIncident.quantity - 1))
-            }
-        }
-    }
 
     suspend fun deleteIncident() {
         incidentsRepository.deleteIncident(uiState.value.incidentDetails.toIncident())

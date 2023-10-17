@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.hoodalert.HoodAlertApplication
+import com.example.hoodalert.ui.viewmodel.SignInViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentListViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentDetailsViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.EditViewModel
@@ -34,6 +35,10 @@ object AppViewModelProvider {
 
         initializer {
             IncidentListViewModel(hoodAlertApplication().container.incidentsRepository)
+        }
+
+        initializer {
+            SignInViewModel(hoodAlertApplication().container.usersRepository)
         }
     }
 }

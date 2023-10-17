@@ -43,7 +43,7 @@ class EditViewModel(
 
     private fun validateInput(uiState: IncidentDetails = incidentUiState.incidentDetails): Boolean {
         return with(uiState) {
-            name.isNotBlank() && price.isNotBlank() && quantity.isNotBlank()
+            title.isNotBlank() && description.isNotBlank()
         }
     }
 }
