@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class EditViewModel(
+class IncidentEditViewModel(
     savedStateHandle: SavedStateHandle,
     private val incidentsRepository: IncidentsRepository
 ) : ViewModel() {

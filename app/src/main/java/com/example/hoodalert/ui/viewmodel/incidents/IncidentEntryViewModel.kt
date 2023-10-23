@@ -7,7 +7,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.hoodalert.data.model.Incident
 import com.example.hoodalert.data.repository.IncidentsRepository
-import java.text.NumberFormat
 import java.util.Date
 
 class IncidentEntryViewModel(private val incidentsRepository: IncidentsRepository) : ViewModel() {
@@ -16,7 +15,10 @@ class IncidentEntryViewModel(private val incidentsRepository: IncidentsRepositor
 
     fun updateUiState(incidentDetails: IncidentDetails) {
         incidentUiState =
-            IncidentUiState(incidentDetails = incidentDetails, isEntryValid = validateInput(incidentDetails))
+            IncidentUiState(
+                incidentDetails = incidentDetails,
+                isEntryValid = validateInput(incidentDetails)
+            )
     }
 
     suspend fun saveIncident() {
@@ -45,6 +47,7 @@ data class IncidentDetails(
 
 fun IncidentDetails.toIncident(): Incident = Incident(
     id = id,
+    communityId = 1,
     userId = 1,
     title = title,
     description = description,

@@ -10,6 +10,13 @@ import java.util.Date
     tableName = "incidents",
     foreignKeys = [
         ForeignKey(
+            entity = Community::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("community_id"),
+            onUpdate = ForeignKey.CASCADE,
+            onDelete = ForeignKey.RESTRICT
+        ),
+        ForeignKey(
             entity = User::class,
             parentColumns = arrayOf("id"),
             childColumns = arrayOf("user_id"),
@@ -20,6 +27,9 @@ import java.util.Date
 )
 data class Incident(
     @PrimaryKey val id: Int,
+
+    @ColumnInfo(name = "community_id")
+    val communityId: Int,
 
     @ColumnInfo(name = "user_id")
     val userId: Int,

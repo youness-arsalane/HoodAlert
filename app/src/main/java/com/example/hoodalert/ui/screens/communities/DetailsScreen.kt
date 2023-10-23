@@ -1,4 +1,4 @@
-package com.example.hoodalert.ui.screens.incidents
+package com.example.hoodalert.ui.screens.communities
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -36,58 +36,59 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hoodalert.R
-import com.example.hoodalert.data.model.Incident
+import com.example.hoodalert.data.model.Community
 import com.example.hoodalert.ui.AppViewModelProvider
 import com.example.hoodalert.ui.components.HoodAlertTopAppBar
 import com.example.hoodalert.ui.navigation.NavigationDestination
-import com.example.hoodalert.ui.viewmodel.incidents.IncidentDetailsUiState
-import com.example.hoodalert.ui.viewmodel.incidents.IncidentDetailsViewModel
-import com.example.hoodalert.ui.viewmodel.incidents.toIncident
+import com.example.hoodalert.ui.viewmodel.communities.CommunityDetailsUiState
+import com.example.hoodalert.ui.viewmodel.communities.CommunityDetailsViewModel
+import com.example.hoodalert.ui.viewmodel.communities.toCommunity
 import kotlinx.coroutines.launch
 
-object IncidentDetailsDestination : NavigationDestination {
-    override val route = "incident_details"
-    override val titleRes = R.string.incident_detail_title
-    const val incidentIdArg = "incidentId"
-    val routeWithArgs = "$route/{$incidentIdArg}"
+object CommunityDetailsDestination : NavigationDestination {
+    override val route = "community_details"
+    override val titleRes = R.string.community_detail_title
+    const val communityIdArg = "communityId"
+    val routeWithArgs = "$route/{$communityIdArg}"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailsScreen(
-    navigateToEditIncident: (Int) -> Unit,
+    navigateToEditCommunity: (Int) -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: IncidentDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: CommunityDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState = viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     Scaffold(
         topBar = {
             HoodAlertTopAppBar(
-                title = stringResource(IncidentDetailsDestination.titleRes),
+                title = stringResource(CommunityDetailsDestination.titleRes),
                 canNavigateBack = true,
                 navigateUp = navigateBack
             )
         }, floatingActionButton = {
             FloatingActionButton(
-                onClick = { navigateToEditIncident(uiState.value.incidentDetails.id) },
+                onClick = { navigateToEditCommunity(uiState.value.communityDetails.id) },
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.padding(20.dp)
 
             ) {
                 Icon(
                     imageVector = Icons.Default.Edit,
-                    contentDescription = stringResource(R.string.edit_incident_title),
+                    contentDescription = stringResource(R.string.edit_community_title),
                 )
             }
         }, modifier = modifier
     ) { innerPadding ->
         DetailsBody(
-            incidentDetailsUiState = uiState.value,
+            communityDetailsUiState = uiState.value,
+            onJoinCommunity = { },
             onDelete = {
                 coroutineScope.launch {
-                    viewModel.deleteIncident()
+                    viewModel.deleteCommunity()
                     navigateBack()
                 }
             },
@@ -100,7 +101,8 @@ fun DetailsScreen(
 
 @Composable
 private fun DetailsBody(
-    incidentDetailsUiState: IncidentDetailsUiState,
+    communityDetailsUiState: CommunityDetailsUiState,
+    onJoinCommunity: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -110,8 +112,16 @@ private fun DetailsBody(
     ) {
         var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
         Details(
-            incident = incidentDetailsUiState.incidentDetails.toIncident(), modifier = Modifier.fillMaxWidth()
+            community = communityDetailsUiState.communityDetails.toCommunity(), modifier = Modifier.fillMaxWidth()
         )
+        Button(
+            onClick = onJoinCommunity,
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.small,
+            enabled = !communityDetailsUiState.outOfStock
+        ) {
+            Text(stringResource(R.string.join))
+        }
         OutlinedButton(
             onClick = { deleteConfirmationRequired = true },
             shape = MaterialTheme.shapes.small,
@@ -135,7 +145,7 @@ private fun DetailsBody(
 
 @Composable
 fun Details(
-    incident: Incident, modifier: Modifier = Modifier
+    community: Community, modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier, colors = CardDefaults.cardColors(
@@ -150,15 +160,8 @@ fun Details(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             DetailsRow(
-                labelResID = R.string.incident,
-                incidentDetail = incident.title,
-                modifier = Modifier.padding(
-                    horizontal = 16.dp
-                )
-            )
-            DetailsRow(
-                labelResID = R.string.description,
-                incidentDetail = incident.description,
+                labelResID = R.string.community,
+                communityDetail = community.name,
                 modifier = Modifier.padding(
                     horizontal = 16.dp
                 )
@@ -170,12 +173,12 @@ fun Details(
 
 @Composable
 private fun DetailsRow(
-    @StringRes labelResID: Int, incidentDetail: String, modifier: Modifier = Modifier
+    @StringRes labelResID: Int, communityDetail: String, modifier: Modifier = Modifier
 ) {
     Row(modifier = modifier) {
         Text(text = stringResource(labelResID))
         Spacer(modifier = Modifier.weight(1f))
-        Text(text = incidentDetail, fontWeight = FontWeight.Bold)
+        Text(text = communityDetail, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -198,3 +201,14 @@ private fun DeleteConfirmationDialog(
             }
         })
 }
+
+//@Preview(showBackground = true)
+//@Composable
+//fun DetailsScreenPreview() {
+//    HoodAlertTheme {
+//        CommunityDetailsBody(CommunityDetailsUiState(
+//            outOfStock = true,
+//            communityDetails = CommunityDetails(1, "Pen", "$100", "10")
+//        ), onJoinCommunity = {}, onDelete = {})
+//    }
+//}

@@ -1,4 +1,4 @@
-package com.example.hoodalert.ui.screens.incidents
+package com.example.hoodalert.ui.screens.communities
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -14,14 +14,14 @@ import com.example.hoodalert.ui.AppViewModelProvider
 import com.example.hoodalert.ui.components.HoodAlertTopAppBar
 import com.example.hoodalert.ui.navigation.NavigationDestination
 import com.example.hoodalert.ui.theme.HoodAlertTheme
-import com.example.hoodalert.ui.viewmodel.incidents.IncidentEditViewModel
+import com.example.hoodalert.ui.viewmodel.communities.CommunityEditViewModel
 import kotlinx.coroutines.launch
 
-object IncidentEditDestination : NavigationDestination {
-    override val route = "incident_edit"
-    override val titleRes = R.string.edit_incident_title
-    const val incidentIdArg = "incidentId"
-    val routeWithArgs = "$route/{$incidentIdArg}"
+object CommunityEditDestination : NavigationDestination {
+    override val route = "community_edit"
+    override val titleRes = R.string.edit_community_title
+    const val communityIdArg = "communityId"
+    val routeWithArgs = "$route/{$communityIdArg}"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,13 +30,13 @@ fun EditScreen(
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: IncidentEditViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: CommunityEditViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val coroutineScope = rememberCoroutineScope()
     Scaffold(
         topBar = {
             HoodAlertTopAppBar(
-                title = stringResource(IncidentEditDestination.titleRes),
+                title = stringResource(CommunityEditDestination.titleRes),
                 canNavigateBack = true,
                 navigateUp = onNavigateUp
             )
@@ -44,11 +44,11 @@ fun EditScreen(
         modifier = modifier
     ) { innerPadding ->
         EntryBody(
-            incidentUiState = viewModel.incidentUiState,
-            onIncidentValueChange = viewModel::updateUiState,
+            communityUiState = viewModel.communityUiState,
+            onCommunityValueChange = viewModel::updateUiState,
             onSaveClick = {
                 coroutineScope.launch {
-                    viewModel.updateIncident()
+                    viewModel.updateCommunity()
                     navigateBack()
                 }
             },

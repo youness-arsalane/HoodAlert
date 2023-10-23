@@ -14,6 +14,8 @@
     <string name="description">Description</string>
     <string name="incidents">Incidents</string>
     <string name="add_incident">Add incident</string>
+    <string name="communities">Communities</string>
+    <string name="add_community">Add community</string>
 
 
     <string name="attention">Attention</string>
@@ -27,10 +29,22 @@
     <string name="incident_entry_title">Add Incident</string>
     <string name="incident_name_req">Incident Name*</string>
     <string name="incident_price_req">Incident Price*</string>
+    <string name="no_community_description">No communities found yet.</string>
+    <string name="edit_community_title">Edit Community</string>
+    <string name="community">Community</string>
+    <string name="community_detail_title">Community Details</string>
+    <string name="community_entry_title">Add Community</string>
+    <string name="community_name_req">Community Name*</string>
+    <string name="community_price_req">Community Price*</string>
     <string name="no">No</string>
     <string name="price">Price</string>
     <string name="save_action">Save</string>
-    <string name="sell">Sell</string>
+    <string name="join">Join</string>
     <string name="yes">Yes</string>
     <string name="required_fields">*required fields</string>
+    <string name="register">Register</string>
+    <string name="register_title">Register</string>
+    <string name="first_name">First name</string>
+    <string name="last_name">Last name</string>
+    <string name="name">Name</string>
 </resources>

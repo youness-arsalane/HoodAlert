@@ -1,6 +1,9 @@
 package com.example.hoodalert.ui.screens
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
@@ -25,6 +28,7 @@ import androidx.navigation.NavController
 import com.example.hoodalert.MainActivity
 import com.example.hoodalert.R
 import com.example.hoodalert.ui.navigation.NavigationDestination
+import com.example.hoodalert.ui.screens.communities.CommunityListDestination
 import com.example.hoodalert.ui.screens.incidents.IncidentListDestination
 import com.example.hoodalert.ui.theme.HoodAlertTheme
 import com.example.hoodalert.util.supportWideScreen
@@ -53,6 +57,9 @@ fun DashboardScreen(
                 contentPadding = contentPadding
             ) {
                 item {
+                    Button(onClick = { navController.navigate(CommunityListDestination.route) }) {
+                        Text(text = "Communities")
+                    }
                     Button(onClick = { navController.navigate(IncidentListDestination.route) }) {
                         Text(text = "Incidents")
                     }

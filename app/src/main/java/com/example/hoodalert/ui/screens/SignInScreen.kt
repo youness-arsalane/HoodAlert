@@ -23,6 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -70,7 +71,8 @@ object SignInDestination : NavigationDestination {
 @Composable
 fun SignInScreen(
     viewModel: SignInViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    onSignInSubmitted: () -> Unit
+    onSignInSubmitted: () -> Unit,
+    onRegister: () -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -96,7 +98,8 @@ fun SignInScreen(
                             SignInContent(
                                 onSignInSubmitted = { email, password ->
                                     viewModel.signIn(email, password, onSignInSubmitted)
-                                }
+                                },
+                                onRegister = onRegister
                             )
                         }
                     }
@@ -139,6 +142,7 @@ fun SignInTopAppBar(
 @Composable
 fun SignInContent(
     onSignInSubmitted: (email: String, password: String) -> Unit,
+    onRegister: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         val focusRequester = remember { FocusRequester() }
@@ -172,6 +176,17 @@ fun SignInContent(
         ) {
             Text(
                 text = stringResource(id = R.string.sign_in)
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        OutlinedButton(
+            onClick = { onRegister() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp)
+        ) {
+            Text(
+                text = stringResource(id = R.string.register)
             )
         }
     }

@@ -7,16 +7,43 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.hoodalert.HoodAlertApplication
+import com.example.hoodalert.ui.viewmodel.RegisterViewModel
 import com.example.hoodalert.ui.viewmodel.SignInViewModel
+import com.example.hoodalert.ui.viewmodel.communities.CommunityListViewModel
+import com.example.hoodalert.ui.viewmodel.communities.CommunityDetailsViewModel
+import com.example.hoodalert.ui.viewmodel.communities.CommunityEditViewModel
+import com.example.hoodalert.ui.viewmodel.communities.CommunityEntryViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentListViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentDetailsViewModel
-import com.example.hoodalert.ui.viewmodel.incidents.EditViewModel
+import com.example.hoodalert.ui.viewmodel.incidents.IncidentEditViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentEntryViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
         initializer {
-            EditViewModel(
+            CommunityEditViewModel(
+                this.createSavedStateHandle(),
+                hoodAlertApplication().container.communitiesRepository
+            )
+        }
+
+        initializer {
+            CommunityEntryViewModel(hoodAlertApplication().container.communitiesRepository)
+        }
+
+        initializer {
+            CommunityDetailsViewModel(
+                this.createSavedStateHandle(),
+                hoodAlertApplication().container.communitiesRepository
+            )
+        }
+
+        initializer {
+            CommunityListViewModel(hoodAlertApplication().container.communitiesRepository)
+        }
+        
+        initializer {
+            IncidentEditViewModel(
                 this.createSavedStateHandle(),
                 hoodAlertApplication().container.incidentsRepository
             )
@@ -39,6 +66,10 @@ object AppViewModelProvider {
 
         initializer {
             SignInViewModel(hoodAlertApplication().container.usersRepository)
+        }
+
+        initializer {
+            RegisterViewModel(hoodAlertApplication().container.usersRepository)
         }
     }
 }

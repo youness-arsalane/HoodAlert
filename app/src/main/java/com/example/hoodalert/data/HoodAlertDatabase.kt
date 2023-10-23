@@ -14,6 +14,7 @@ import com.example.hoodalert.data.model.CommunityUser
 import com.example.hoodalert.data.model.Incident
 import com.example.hoodalert.data.model.User
 import com.example.hoodalert.util.Converters
+import java.io.File
 
 @Database(
     entities = [
@@ -22,8 +23,8 @@ import com.example.hoodalert.util.Converters
         Incident::class,
         User::class,
     ],
-    version = 3,
-    exportSchema = false
+    version = 5
+//    exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class HoodAlertDatabase : RoomDatabase() {
@@ -37,13 +38,24 @@ abstract class HoodAlertDatabase : RoomDatabase() {
         private var Instance: HoodAlertDatabase? = null
 
         fun getDatabase(context: Context): HoodAlertDatabase {
-            return Instance ?: synchronized(this) {
-                Room.databaseBuilder(context, HoodAlertDatabase::class.java, "HoodAlert")
-                    .fallbackToDestructiveMigration()
-                    .addCallback(HoodAlertCallback(context))
-                    .build()
-                    .also { Instance = it }
+            synchronized(this) {
+                if (Instance == null) {
+                    Instance = Room.databaseBuilder(context, HoodAlertDatabase::class.java, "HoodAlert")
+                        .fallbackToDestructiveMigration()
+                        .addCallback(HoodAlertCallback(context))
+                        .build()
+                }
+
+                return Instance!!;
             }
+
+//            return Instance ?: synchronized(this) {
+//                Room.databaseBuilder(context, HoodAlertDatabase::class.java, "HoodAlert")
+//                    .fallbackToDestructiveMigration()
+//                    .addCallback(HoodAlertCallback(context))
+//                    .build()
+//                    .also { Instance = it }
+//            }
         }
     }
 }

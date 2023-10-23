@@ -10,16 +10,26 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.hoodalert.ui.screens.DashboardDestination
 import com.example.hoodalert.ui.screens.DashboardScreen
+import com.example.hoodalert.ui.screens.RegisterDestination
+import com.example.hoodalert.ui.screens.RegisterScreen
 import com.example.hoodalert.ui.screens.SignInDestination
 import com.example.hoodalert.ui.screens.SignInScreen
+import com.example.hoodalert.ui.screens.communities.CommunityListDestination
+import com.example.hoodalert.ui.screens.communities.ListScreen as CommunityListScreen
+import com.example.hoodalert.ui.screens.communities.CommunityDetailsDestination
+import com.example.hoodalert.ui.screens.communities.DetailsScreen as CommunityDetailsScreen
+import com.example.hoodalert.ui.screens.communities.CommunityEditDestination
+import com.example.hoodalert.ui.screens.communities.EditScreen as CommunityEditScreen
+import com.example.hoodalert.ui.screens.communities.CommunityEntryDestination
+import com.example.hoodalert.ui.screens.communities.EntryScreen as CommunityEntryScreen
 import com.example.hoodalert.ui.screens.incidents.IncidentListDestination
-import com.example.hoodalert.ui.screens.incidents.ListScreen
+import com.example.hoodalert.ui.screens.incidents.ListScreen as IncidentListScreen
 import com.example.hoodalert.ui.screens.incidents.IncidentDetailsDestination
-import com.example.hoodalert.ui.screens.incidents.DetailsScreen
+import com.example.hoodalert.ui.screens.incidents.DetailsScreen as IncidentDetailsScreen
 import com.example.hoodalert.ui.screens.incidents.IncidentEditDestination
-import com.example.hoodalert.ui.screens.incidents.EditScreen
+import com.example.hoodalert.ui.screens.incidents.EditScreen as IncidentEditScreen
 import com.example.hoodalert.ui.screens.incidents.IncidentEntryDestination
-import com.example.hoodalert.ui.screens.incidents.EntryScreen
+import com.example.hoodalert.ui.screens.incidents.EntryScreen as IncidentEntryScreen
 
 @Composable
 fun HoodAlertNavHost(
@@ -33,19 +43,60 @@ fun HoodAlertNavHost(
     ) {
         composable(route = SignInDestination.route) {
             SignInScreen(
-                onSignInSubmitted = { navController.navigate(DashboardDestination.route) }
+                onSignInSubmitted = { navController.navigate(DashboardDestination.route) },
+                onRegister = { navController.navigate(RegisterDestination.route) }
             )
         }
-
+        composable(route = RegisterDestination.route) {
+            RegisterScreen(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() }
+            )
+        }
         composable(route = DashboardDestination.route) {
             DashboardScreen(
                 navController = navController,
                 onNavUp = navController::navigateUp,
             )
         }
-
+        composable(route = CommunityListDestination.route) {
+            CommunityListScreen(
+                navigateToCommunityEntry = { navController.navigate(CommunityEntryDestination.route) },
+                navigateToCommunityUpdate = {
+                    navController.navigate("${CommunityDetailsDestination.route}/${it}")
+                }
+            )
+        }
+        composable(route = CommunityEntryDestination.route) {
+            CommunityEntryScreen(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() }
+            )
+        }
+        composable(
+            route = CommunityDetailsDestination.routeWithArgs,
+            arguments = listOf(navArgument(CommunityDetailsDestination.communityIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            CommunityDetailsScreen(
+                navigateToEditCommunity = { navController.navigate("${CommunityEditDestination.route}/$it") },
+                navigateBack = { navController.navigateUp() }
+            )
+        }
+        composable(
+            route = CommunityEditDestination.routeWithArgs,
+            arguments = listOf(navArgument(CommunityEditDestination.communityIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            CommunityEditScreen(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() }
+            )
+        }
         composable(route = IncidentListDestination.route) {
-            ListScreen(
+            IncidentListScreen(
                 navigateToIncidentEntry = { navController.navigate(IncidentEntryDestination.route) },
                 navigateToIncidentUpdate = {
                     navController.navigate("${IncidentDetailsDestination.route}/${it}")
@@ -53,7 +104,7 @@ fun HoodAlertNavHost(
             )
         }
         composable(route = IncidentEntryDestination.route) {
-            EntryScreen(
+            IncidentEntryScreen(
                 navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() }
             )
@@ -64,7 +115,7 @@ fun HoodAlertNavHost(
                 type = NavType.IntType
             })
         ) {
-            DetailsScreen(
+            IncidentDetailsScreen(
                 navigateToEditIncident = { navController.navigate("${IncidentEditDestination.route}/$it") },
                 navigateBack = { navController.navigateUp() }
             )
@@ -75,7 +126,7 @@ fun HoodAlertNavHost(
                 type = NavType.IntType
             })
         ) {
-            EditScreen(
+            IncidentEditScreen(
                 navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() }
             )
