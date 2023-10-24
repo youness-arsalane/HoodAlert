@@ -7,15 +7,8 @@ import androidx.room.PrimaryKey
 import java.util.Date
 
 @Entity(
-    tableName = "community_users",
+    tableName = "user_sessions",
     foreignKeys = [
-        ForeignKey(
-            entity = Community::class,
-            parentColumns = arrayOf("id"),
-            childColumns = arrayOf("community_id"),
-            onUpdate = ForeignKey.CASCADE,
-            onDelete = ForeignKey.CASCADE
-        ),
         ForeignKey(
             entity = User::class,
             parentColumns = arrayOf("id"),
@@ -25,15 +18,15 @@ import java.util.Date
         )
     ]
 )
-data class CommunityUser(
+data class UserSession(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
 
-    @ColumnInfo(name = "community_id")
-    val communityId: Int,
-
     @ColumnInfo(name = "user_id")
     val userId: Int,
+
+    @ColumnInfo(name = "token")
+    val token: String,
 
     @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
     val createdAt: Date,

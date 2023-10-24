@@ -1,5 +1,7 @@
 package com.example.hoodalert.ui.screens
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +54,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hoodalert.MainActivity
 import com.example.hoodalert.R
+import com.example.hoodalert.data.auth.SharedPreferencesManager
+import com.example.hoodalert.data.model.User
 import com.example.hoodalert.ui.AppViewModelProvider
 import com.example.hoodalert.ui.components.EmailState
 import com.example.hoodalert.ui.components.EmailStateSaver
@@ -61,6 +66,10 @@ import com.example.hoodalert.ui.theme.HoodAlertTheme
 import com.example.hoodalert.ui.viewmodel.SignInViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentEntryViewModel
 import com.example.hoodalert.util.supportWideScreen
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.count
+import kotlinx.coroutines.launch
 
 object SignInDestination : NavigationDestination {
     override val route = "sign_in"
@@ -71,9 +80,11 @@ object SignInDestination : NavigationDestination {
 @Composable
 fun SignInScreen(
     viewModel: SignInViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    onSignInSubmitted: () -> Unit,
+    context: Context,
+    onSignInSuccess: () -> Unit,
     onRegister: () -> Unit
 ) {
+    val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -97,7 +108,37 @@ fun SignInScreen(
                         Column(modifier = Modifier.fillMaxWidth()) {
                             SignInContent(
                                 onSignInSubmitted = { email, password ->
-                                    viewModel.signIn(email, password, onSignInSubmitted)
+                                    Log.d("HOOD_ALERT_DEBUG", "onSignInSubmitted")
+
+                                    coroutineScope.launch {
+                                        viewModel.signIn(
+                                            email = email,
+                                            password = password,
+                                            onSignInSuccess = { user ->
+                                                Log.d("HOOD_ALERT_DEBUG", "User is found!")
+                                                val sharedPreferencesManager = SharedPreferencesManager(context)
+                                                val token = sharedPreferencesManager.generateToken(user)
+                                                    ?: throw Exception("Generated token is empty")
+                                                Log.d("HOOD_ALERT_DEBUG", "Token generated!")
+                                                sharedPreferencesManager.saveUserToken(token);
+                                                Log.d("HOOD_ALERT_DEBUG", "Token saved locally!")
+
+                                                coroutineScope.launch {
+                                                    viewModel.saveSession(
+                                                        user = user,
+                                                        token = token
+                                                    )
+                                                    Log.d("HOOD_ALERT_DEBUG", "Token saved in database!")
+
+                                                    onSignInSuccess()
+                                                    Log.d("HOOD_ALERT_DEBUG", "Callback called!")
+                                                }
+                                            },
+                                            onSignInFailed = {
+                                                Log.d("HOOD_ALERT_DEBUG", "User is not found")
+                                            },
+                                        )
+                                    }
                                 },
                                 onRegister = onRegister
                             )
@@ -117,7 +158,6 @@ fun SignInScreen(
         )
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -349,13 +389,3 @@ fun ErrorSnackbar(
             .wrapContentHeight(Alignment.Bottom)
     )
 }
-
-//@Preview(name = "Sign in")
-//@Composable
-//fun SignInPreview() {
-//    HoodAlertTheme {
-//        SignInScreen(
-//            onSignInSubmitted = { _, _ -> },
-//        )
-//    }
-//}

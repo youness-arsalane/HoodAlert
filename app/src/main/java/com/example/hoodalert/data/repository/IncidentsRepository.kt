@@ -11,7 +11,7 @@ class IncidentsRepository(private val incidentDao: IncidentDao) {
 
     suspend fun insertIncident(incident: Incident) = incidentDao.insert(incident)
 
-    suspend fun deleteIncident(incident: Incident) = incidentDao.delete(incident)
-
     suspend fun updateIncident(incident: Incident) = incidentDao.update(incident)
+
+    suspend fun deleteIncident(incident: Incident) = incidentDao.delete(incident)
 }

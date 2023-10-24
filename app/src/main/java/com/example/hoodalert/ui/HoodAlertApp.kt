@@ -1,4 +1,4 @@
-package com.example.hoodalert
+package com.example.hoodalert.ui
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController

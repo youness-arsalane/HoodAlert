@@ -11,7 +11,7 @@ class CommunitiesRepository(private val communityDao: CommunityDao) {
 
     suspend fun insertCommunity(community: Community) = communityDao.insert(community)
 
-    suspend fun deleteCommunity(community: Community) = communityDao.delete(community)
-
     suspend fun updateCommunity(community: Community) = communityDao.update(community)
+
+    suspend fun deleteCommunity(community: Community) = communityDao.delete(community)
 }

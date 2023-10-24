@@ -9,7 +9,7 @@ import java.util.Date
     tableName = "communities"
 )
 data class Community(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     val id: Int,
 
     @ColumnInfo(name = "name")

@@ -8,6 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.hoodalert.data.auth.SharedPreferencesManager
 import com.example.hoodalert.ui.screens.DashboardDestination
 import com.example.hoodalert.ui.screens.DashboardScreen
 import com.example.hoodalert.ui.screens.RegisterDestination
@@ -43,7 +44,8 @@ fun HoodAlertNavHost(
     ) {
         composable(route = SignInDestination.route) {
             SignInScreen(
-                onSignInSubmitted = { navController.navigate(DashboardDestination.route) },
+                context = navController.context,
+                onSignInSuccess = { navController.navigate(DashboardDestination.route) },
                 onRegister = { navController.navigate(RegisterDestination.route) }
             )
         }

@@ -26,7 +26,8 @@ import java.util.Date
     ]
 )
 data class Incident(
-    @PrimaryKey val id: Int,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int,
 
     @ColumnInfo(name = "community_id")
     val communityId: Int,

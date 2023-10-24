@@ -9,7 +9,7 @@ import java.util.Date
     tableName = "users"
 )
 data class User(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     val id: Int,
 
     @ColumnInfo(name = "email")

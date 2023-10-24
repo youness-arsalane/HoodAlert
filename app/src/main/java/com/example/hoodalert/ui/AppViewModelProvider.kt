@@ -21,6 +21,17 @@ import com.example.hoodalert.ui.viewmodel.incidents.IncidentEntryViewModel
 object AppViewModelProvider {
     val Factory = viewModelFactory {
         initializer {
+            SignInViewModel(
+                hoodAlertApplication().container.usersRepository,
+                hoodAlertApplication().container.userSessionsRepository
+            )
+        }
+
+        initializer {
+            RegisterViewModel(hoodAlertApplication().container.usersRepository)
+        }
+
+        initializer {
             CommunityEditViewModel(
                 this.createSavedStateHandle(),
                 hoodAlertApplication().container.communitiesRepository
@@ -62,14 +73,6 @@ object AppViewModelProvider {
 
         initializer {
             IncidentListViewModel(hoodAlertApplication().container.incidentsRepository)
-        }
-
-        initializer {
-            SignInViewModel(hoodAlertApplication().container.usersRepository)
-        }
-
-        initializer {
-            RegisterViewModel(hoodAlertApplication().container.usersRepository)
         }
     }
 }
