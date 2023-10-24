@@ -51,4 +51,9 @@ class SignInViewModel(private val usersRepository: UsersRepository, private val 
 
         userSessionsRepository.insertUserSession(userSession)
     }
+
+    suspend fun isLoggedIn(token : String): Boolean
+    {
+        return userSessionsRepository.findUserSessionByToken(token) != null;
+    }
 }

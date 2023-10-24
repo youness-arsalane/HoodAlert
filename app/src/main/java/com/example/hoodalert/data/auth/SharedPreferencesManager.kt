@@ -3,8 +3,9 @@ package com.example.hoodalert.data.auth
 import android.content.Context
 import android.content.SharedPreferences
 import com.example.hoodalert.data.model.User
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
+import java.security.MessageDigest
+import java.security.SecureRandom
+import java.util.Base64
 import java.util.Date
 
 private const val USER_TOKEN_KEY = "userToken";
@@ -25,14 +26,10 @@ class SharedPreferencesManager(private val context: Context) {
         sharedPreferences.edit().remove(USER_TOKEN_KEY).apply()
     }
 
-    fun generateToken(user: User): String? {
-        val expiration = Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7))
-
-        return Jwts.builder()
-            .setSubject(user.email)
-            .claim("userId", user.id)
-            .setExpiration(expiration)
-            .signWith(SignatureAlgorithm.HS256, "secretKey")
-            .compact();
+    fun generateToken(tokenLength: Int = 32): String {
+        val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+        return (1..tokenLength)
+            .map { allowedChars.random() }
+            .joinToString("")
     }
 }

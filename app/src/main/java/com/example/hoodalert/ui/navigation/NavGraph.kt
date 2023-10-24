@@ -44,7 +44,7 @@ fun HoodAlertNavHost(
     ) {
         composable(route = SignInDestination.route) {
             SignInScreen(
-                context = navController.context,
+                navController = navController,
                 onSignInSuccess = { navController.navigate(DashboardDestination.route) },
                 onRegister = { navController.navigate(RegisterDestination.route) }
             )

@@ -52,6 +52,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.hoodalert.MainActivity
 import com.example.hoodalert.R
 import com.example.hoodalert.data.auth.SharedPreferencesManager
@@ -62,6 +63,7 @@ import com.example.hoodalert.ui.components.EmailStateSaver
 import com.example.hoodalert.ui.components.PasswordState
 import com.example.hoodalert.ui.components.TextFieldState
 import com.example.hoodalert.ui.navigation.NavigationDestination
+import com.example.hoodalert.ui.screens.communities.CommunityListDestination
 import com.example.hoodalert.ui.theme.HoodAlertTheme
 import com.example.hoodalert.ui.viewmodel.SignInViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentEntryViewModel
@@ -80,12 +82,22 @@ object SignInDestination : NavigationDestination {
 @Composable
 fun SignInScreen(
     viewModel: SignInViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    context: Context,
+    navController: NavController,
     onSignInSuccess: () -> Unit,
     onRegister: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    val sharedPreferencesManager = SharedPreferencesManager(navController.context)
+    Log.d("HOOD_ALERT_DEBUG", "SignInScreen")
+    Log.d("HOOD_ALERT_DEBUG", "sharedPreferencesManager " + sharedPreferencesManager.getUserToken())
+
+//    coroutineScope.launch {
+//        if (viewModel.isLoggedIn(sharedPreferencesManager.getUserToken().toString())) {
+//            navController.navigate(CommunityListDestination.route);
+//            return;
+//        }
+//    }
 
     Scaffold(
         topBar = {
@@ -116,9 +128,8 @@ fun SignInScreen(
                                             password = password,
                                             onSignInSuccess = { user ->
                                                 Log.d("HOOD_ALERT_DEBUG", "User is found!")
-                                                val sharedPreferencesManager = SharedPreferencesManager(context)
-                                                val token = sharedPreferencesManager.generateToken(user)
-                                                    ?: throw Exception("Generated token is empty")
+
+                                                val token = sharedPreferencesManager.generateToken()
                                                 Log.d("HOOD_ALERT_DEBUG", "Token generated!")
                                                 sharedPreferencesManager.saveUserToken(token);
                                                 Log.d("HOOD_ALERT_DEBUG", "Token saved locally!")
