@@ -14,8 +14,14 @@ interface AppContainer {
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
-    override val communitiesRepository = CommunitiesRepository(HoodAlertDatabase.DatabaseInstance.getInstance(context).communityDao())
-    override val incidentsRepository = IncidentsRepository(HoodAlertDatabase.DatabaseInstance.getInstance(context).incidentDao())
-    override val usersRepository = UsersRepository(HoodAlertDatabase.DatabaseInstance.getInstance(context).userDao())
-    override val userSessionsRepository = UserSessionsRepository(HoodAlertDatabase.DatabaseInstance.getInstance(context).userSessionDao())
+    override val communitiesRepository = CommunitiesRepository(
+        HoodAlertDatabase.DatabaseInstance.getInstance(context).communityDao()
+    )
+    override val incidentsRepository =
+        IncidentsRepository(HoodAlertDatabase.DatabaseInstance.getInstance(context).incidentDao())
+    override val usersRepository =
+        UsersRepository(HoodAlertDatabase.DatabaseInstance.getInstance(context).userDao())
+    override val userSessionsRepository = UserSessionsRepository(
+        HoodAlertDatabase.DatabaseInstance.getInstance(context).userSessionDao()
+    )
 }

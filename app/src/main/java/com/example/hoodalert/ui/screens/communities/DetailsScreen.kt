@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -18,6 +19,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -62,12 +64,31 @@ fun DetailsScreen(
 ) {
     val uiState = viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+
+    val community = uiState.value.communityDetails.toCommunity();
+
     Scaffold(
         topBar = {
             HoodAlertTopAppBar(
-                title = stringResource(CommunityDetailsDestination.titleRes),
+                title = community.name,
                 canNavigateBack = true,
-                navigateUp = navigateBack
+                navigateUp = navigateBack,
+                actions = {
+                    IconButton(
+                        onClick = {
+                            coroutineScope.launch {
+                                viewModel.deleteCommunity()
+                                navigateBack()
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = stringResource(id = R.string.delete),
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
             )
         }, floatingActionButton = {
             FloatingActionButton(
@@ -112,13 +133,13 @@ private fun DetailsBody(
     ) {
         var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
         Details(
-            community = communityDetailsUiState.communityDetails.toCommunity(), modifier = Modifier.fillMaxWidth()
+            community = communityDetailsUiState.communityDetails.toCommunity(),
+            modifier = Modifier.fillMaxWidth()
         )
         Button(
             onClick = onJoinCommunity,
             modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.small,
-            enabled = !communityDetailsUiState.outOfStock
+            shape = MaterialTheme.shapes.small
         ) {
             Text(stringResource(R.string.join))
         }
@@ -201,14 +222,3 @@ private fun DeleteConfirmationDialog(
             }
         })
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun DetailsScreenPreview() {
-//    HoodAlertTheme {
-//        CommunityDetailsBody(CommunityDetailsUiState(
-//            outOfStock = true,
-//            communityDetails = CommunityDetails(1, "Pen", "$100", "10")
-//        ), onJoinCommunity = {}, onDelete = {})
-//    }
-//}

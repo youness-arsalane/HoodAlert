@@ -1,6 +1,7 @@
 package com.example.hoodalert.data.repository
 
 import com.example.hoodalert.data.dao.IncidentDao
+import com.example.hoodalert.data.model.Community
 import com.example.hoodalert.data.model.Incident
 import kotlinx.coroutines.flow.Flow
 
@@ -14,4 +15,7 @@ class IncidentsRepository(private val incidentDao: IncidentDao) {
     suspend fun updateIncident(incident: Incident) = incidentDao.update(incident)
 
     suspend fun deleteIncident(incident: Incident) = incidentDao.delete(incident)
+
+
+    fun findByCommunity(community: Community): Flow<List<Incident>> = incidentDao.findByCommunityId(community.id)
 }

@@ -1,6 +1,5 @@
 package com.example.hoodalert.data.repository
 
-import android.util.Log
 import com.example.hoodalert.data.dao.UserSessionDao
 import com.example.hoodalert.data.model.UserSession
 import kotlinx.coroutines.flow.Flow
@@ -12,7 +11,8 @@ class UserSessionsRepository(private val userSessionDao: UserSessionDao) {
 
     fun getUserSessionStream(id: Int): Flow<UserSession?> = userSessionDao.getUserSession(id)
 
-    fun getUserSessionByToken(token: String): Flow<UserSession?> = userSessionDao.getUserSessionByToken(token)
+    fun getUserSessionByToken(token: String): Flow<UserSession?> =
+        userSessionDao.getUserSessionByToken(token)
 
     suspend fun insertUserSession(userSession: UserSession) = userSessionDao.insert(userSession)
 
@@ -20,7 +20,11 @@ class UserSessionsRepository(private val userSessionDao: UserSessionDao) {
 
     suspend fun deleteUserSession(userSession: UserSession) = userSessionDao.delete(userSession)
 
-    suspend fun findUserSessionByToken(token: String) : UserSession? {
+    suspend fun findUserSessionByToken(token: String): UserSession? {
+        userSessionDao.getUserSessionByToken(token).collect { userSession ->
+
+        }
+
         val userSession = userSessionDao.getUserSessionByToken(token);
         if (userSession.count() == 0) {
             return null;

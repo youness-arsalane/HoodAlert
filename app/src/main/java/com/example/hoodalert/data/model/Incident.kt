@@ -14,14 +14,14 @@ import java.util.Date
             parentColumns = arrayOf("id"),
             childColumns = arrayOf("community_id"),
             onUpdate = ForeignKey.CASCADE,
-            onDelete = ForeignKey.RESTRICT
+            onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
             entity = User::class,
             parentColumns = arrayOf("id"),
             childColumns = arrayOf("user_id"),
             onUpdate = ForeignKey.CASCADE,
-            onDelete = ForeignKey.RESTRICT
+            onDelete = ForeignKey.CASCADE
         )
     ]
 )

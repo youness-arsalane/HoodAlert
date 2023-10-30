@@ -16,6 +16,9 @@ interface IncidentDao {
     @Query("SELECT * from incidents")
     fun getAllIncidents(): Flow<List<Incident>>
 
+    @Query("SELECT * from incidents WHERE community_id = :communityId")
+    fun findByCommunityId(communityId: Int): Flow<List<Incident>>
+
     @Query("SELECT * from incidents WHERE id = :id")
     fun getIncident(id: Int): Flow<Incident>
 

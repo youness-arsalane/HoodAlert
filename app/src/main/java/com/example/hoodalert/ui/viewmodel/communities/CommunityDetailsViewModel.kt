@@ -16,7 +16,8 @@ class CommunityDetailsViewModel(
     private val communitiesRepository: CommunitiesRepository,
 ) : ViewModel() {
 
-    private val communityId: Int = checkNotNull(savedStateHandle[CommunityDetailsDestination.communityIdArg])
+    private val communityId: Int =
+        checkNotNull(savedStateHandle[CommunityDetailsDestination.communityIdArg])
 
     val uiState: StateFlow<CommunityDetailsUiState> =
         communitiesRepository.getCommunityStream(communityId)
@@ -39,6 +40,5 @@ class CommunityDetailsViewModel(
 }
 
 data class CommunityDetailsUiState(
-    val outOfStock: Boolean = true,
     val communityDetails: CommunityDetails = CommunityDetails()
 )

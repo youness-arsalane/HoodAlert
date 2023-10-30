@@ -2,11 +2,6 @@ package com.example.hoodalert.data.auth
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.hoodalert.data.model.User
-import java.security.MessageDigest
-import java.security.SecureRandom
-import java.util.Base64
-import java.util.Date
 
 private const val USER_TOKEN_KEY = "userToken";
 

@@ -19,7 +19,8 @@ class CommunityEditViewModel(
     var communityUiState by mutableStateOf(CommunityUiState())
         private set
 
-    private val communityId: Int = checkNotNull(savedStateHandle[CommunityEditDestination.communityIdArg])
+    private val communityId: Int =
+        checkNotNull(savedStateHandle[CommunityEditDestination.communityIdArg])
 
     init {
         viewModelScope.launch {
@@ -38,7 +39,10 @@ class CommunityEditViewModel(
 
     fun updateUiState(communityDetails: CommunityDetails) {
         communityUiState =
-            CommunityUiState(communityDetails = communityDetails, isEntryValid = validateInput(communityDetails))
+            CommunityUiState(
+                communityDetails = communityDetails,
+                isEntryValid = validateInput(communityDetails)
+            )
     }
 
     private fun validateInput(uiState: CommunityDetails = communityUiState.communityDetails): Boolean {

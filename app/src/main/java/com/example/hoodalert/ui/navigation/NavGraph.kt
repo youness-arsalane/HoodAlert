@@ -3,45 +3,62 @@ package com.example.hoodalert.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.hoodalert.data.auth.SharedPreferencesManager
+import com.example.hoodalert.ui.AppViewModelProvider
 import com.example.hoodalert.ui.screens.DashboardDestination
 import com.example.hoodalert.ui.screens.DashboardScreen
 import com.example.hoodalert.ui.screens.RegisterDestination
 import com.example.hoodalert.ui.screens.RegisterScreen
 import com.example.hoodalert.ui.screens.SignInDestination
 import com.example.hoodalert.ui.screens.SignInScreen
-import com.example.hoodalert.ui.screens.communities.CommunityListDestination
-import com.example.hoodalert.ui.screens.communities.ListScreen as CommunityListScreen
 import com.example.hoodalert.ui.screens.communities.CommunityDetailsDestination
-import com.example.hoodalert.ui.screens.communities.DetailsScreen as CommunityDetailsScreen
 import com.example.hoodalert.ui.screens.communities.CommunityEditDestination
-import com.example.hoodalert.ui.screens.communities.EditScreen as CommunityEditScreen
 import com.example.hoodalert.ui.screens.communities.CommunityEntryDestination
-import com.example.hoodalert.ui.screens.communities.EntryScreen as CommunityEntryScreen
-import com.example.hoodalert.ui.screens.incidents.IncidentListDestination
-import com.example.hoodalert.ui.screens.incidents.ListScreen as IncidentListScreen
+import com.example.hoodalert.ui.screens.communities.CommunityListDestination
 import com.example.hoodalert.ui.screens.incidents.IncidentDetailsDestination
-import com.example.hoodalert.ui.screens.incidents.DetailsScreen as IncidentDetailsScreen
 import com.example.hoodalert.ui.screens.incidents.IncidentEditDestination
-import com.example.hoodalert.ui.screens.incidents.EditScreen as IncidentEditScreen
 import com.example.hoodalert.ui.screens.incidents.IncidentEntryDestination
+import com.example.hoodalert.ui.screens.incidents.IncidentListDestination
+import com.example.hoodalert.ui.viewmodel.SignInViewModel
+import kotlinx.coroutines.launch
+import com.example.hoodalert.ui.screens.communities.DetailsScreen as CommunityDetailsScreen
+import com.example.hoodalert.ui.screens.communities.EditScreen as CommunityEditScreen
+import com.example.hoodalert.ui.screens.communities.EntryScreen as CommunityEntryScreen
+import com.example.hoodalert.ui.screens.communities.ListScreen as CommunityListScreen
+import com.example.hoodalert.ui.screens.incidents.DetailsScreen as IncidentDetailsScreen
+import com.example.hoodalert.ui.screens.incidents.EditScreen as IncidentEditScreen
 import com.example.hoodalert.ui.screens.incidents.EntryScreen as IncidentEntryScreen
+import com.example.hoodalert.ui.screens.incidents.ListScreen as IncidentListScreen
 
 @Composable
 fun HoodAlertNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
+    val signInViewModel: SignInViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    val sharedPreferencesManager = SharedPreferencesManager(navController.context)
+
     NavHost(
         navController = navController,
         startDestination = SignInDestination.route,
         modifier = modifier
     ) {
+        signInViewModel.viewModelScope.launch {
+            val token: String = sharedPreferencesManager.getUserToken().toString();
+            signInViewModel.getUserSessionByToken(token).collect { userSession ->
+                if (userSession != null) {
+                    navController.navigate(DashboardDestination.route);
+                }
+            }
+        }
+
         composable(route = SignInDestination.route) {
             SignInScreen(
                 navController = navController,

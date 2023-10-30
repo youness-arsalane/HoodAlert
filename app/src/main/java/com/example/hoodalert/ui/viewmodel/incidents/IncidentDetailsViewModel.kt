@@ -16,7 +16,8 @@ class IncidentDetailsViewModel(
     private val incidentsRepository: IncidentsRepository,
 ) : ViewModel() {
 
-    private val incidentId: Int = checkNotNull(savedStateHandle[IncidentDetailsDestination.incidentIdArg])
+    private val incidentId: Int =
+        checkNotNull(savedStateHandle[IncidentDetailsDestination.incidentIdArg])
 
     val uiState: StateFlow<IncidentDetailsUiState> =
         incidentsRepository.getIncidentStream(incidentId)
@@ -39,6 +40,5 @@ class IncidentDetailsViewModel(
 }
 
 data class IncidentDetailsUiState(
-    val outOfStock: Boolean = true,
     val incidentDetails: IncidentDetails = IncidentDetails()
 )

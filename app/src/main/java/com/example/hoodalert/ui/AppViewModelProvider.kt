@@ -9,14 +9,14 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.hoodalert.HoodAlertApplication
 import com.example.hoodalert.ui.viewmodel.RegisterViewModel
 import com.example.hoodalert.ui.viewmodel.SignInViewModel
-import com.example.hoodalert.ui.viewmodel.communities.CommunityListViewModel
 import com.example.hoodalert.ui.viewmodel.communities.CommunityDetailsViewModel
 import com.example.hoodalert.ui.viewmodel.communities.CommunityEditViewModel
 import com.example.hoodalert.ui.viewmodel.communities.CommunityEntryViewModel
-import com.example.hoodalert.ui.viewmodel.incidents.IncidentListViewModel
+import com.example.hoodalert.ui.viewmodel.communities.CommunityListViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentDetailsViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentEditViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentEntryViewModel
+import com.example.hoodalert.ui.viewmodel.incidents.IncidentListViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
@@ -52,7 +52,7 @@ object AppViewModelProvider {
         initializer {
             CommunityListViewModel(hoodAlertApplication().container.communitiesRepository)
         }
-        
+
         initializer {
             IncidentEditViewModel(
                 this.createSavedStateHandle(),

@@ -9,7 +9,8 @@ import com.example.hoodalert.data.model.Community
 import com.example.hoodalert.data.repository.CommunitiesRepository
 import java.util.Date
 
-class CommunityEntryViewModel(private val communitiesRepository: CommunitiesRepository) : ViewModel() {
+class CommunityEntryViewModel(private val communitiesRepository: CommunitiesRepository) :
+    ViewModel() {
     var communityUiState by mutableStateOf(CommunityUiState())
         private set
 
@@ -51,10 +52,11 @@ fun CommunityDetails.toCommunity(): Community = Community(
     updatedAt = Date()
 )
 
-fun Community.toCommunityUiState(isEntryValid: Boolean = false): CommunityUiState = CommunityUiState(
-    communityDetails = this.toCommunityDetails(),
-    isEntryValid = isEntryValid
-)
+fun Community.toCommunityUiState(isEntryValid: Boolean = false): CommunityUiState =
+    CommunityUiState(
+        communityDetails = this.toCommunityDetails(),
+        isEntryValid = isEntryValid
+    )
 
 fun Community.toCommunityDetails(): CommunityDetails = CommunityDetails(
     id = id,

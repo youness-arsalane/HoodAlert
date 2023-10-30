@@ -19,7 +19,8 @@ class IncidentEditViewModel(
     var incidentUiState by mutableStateOf(IncidentUiState())
         private set
 
-    private val incidentId: Int = checkNotNull(savedStateHandle[IncidentEditDestination.incidentIdArg])
+    private val incidentId: Int =
+        checkNotNull(savedStateHandle[IncidentEditDestination.incidentIdArg])
 
     init {
         viewModelScope.launch {
@@ -38,7 +39,10 @@ class IncidentEditViewModel(
 
     fun updateUiState(incidentDetails: IncidentDetails) {
         incidentUiState =
-            IncidentUiState(incidentDetails = incidentDetails, isEntryValid = validateInput(incidentDetails))
+            IncidentUiState(
+                incidentDetails = incidentDetails,
+                isEntryValid = validateInput(incidentDetails)
+            )
     }
 
     private fun validateInput(uiState: IncidentDetails = incidentUiState.incidentDetails): Boolean {

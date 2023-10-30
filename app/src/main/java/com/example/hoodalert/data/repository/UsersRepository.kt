@@ -1,6 +1,5 @@
 package com.example.hoodalert.data.repository
 
-import android.util.Log
 import com.example.hoodalert.data.dao.UserDao
 import com.example.hoodalert.data.model.User
 import kotlinx.coroutines.flow.Flow
@@ -20,7 +19,7 @@ class UsersRepository(private val userDao: UserDao) {
 
     suspend fun deleteUser(user: User) = userDao.delete(user)
 
-    suspend fun findUserByCredentials(email: String, password: String) : User? {
+    suspend fun findUserByCredentials(email: String, password: String): User? {
         val user = userDao.getUserByEmail(email);
         if (user.count() == 0) {
             return null;

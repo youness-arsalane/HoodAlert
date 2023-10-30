@@ -1,6 +1,5 @@
 package com.example.hoodalert.ui.screens
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,28 +48,19 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.hoodalert.MainActivity
 import com.example.hoodalert.R
 import com.example.hoodalert.data.auth.SharedPreferencesManager
-import com.example.hoodalert.data.model.User
 import com.example.hoodalert.ui.AppViewModelProvider
 import com.example.hoodalert.ui.components.EmailState
 import com.example.hoodalert.ui.components.EmailStateSaver
 import com.example.hoodalert.ui.components.PasswordState
 import com.example.hoodalert.ui.components.TextFieldState
 import com.example.hoodalert.ui.navigation.NavigationDestination
-import com.example.hoodalert.ui.screens.communities.CommunityListDestination
-import com.example.hoodalert.ui.theme.HoodAlertTheme
 import com.example.hoodalert.ui.viewmodel.SignInViewModel
-import com.example.hoodalert.ui.viewmodel.incidents.IncidentEntryViewModel
 import com.example.hoodalert.util.supportWideScreen
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.launch
 
 object SignInDestination : NavigationDestination {
@@ -89,15 +79,6 @@ fun SignInScreen(
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val sharedPreferencesManager = SharedPreferencesManager(navController.context)
-    Log.d("HOOD_ALERT_DEBUG", "SignInScreen")
-    Log.d("HOOD_ALERT_DEBUG", "sharedPreferencesManager " + sharedPreferencesManager.getUserToken())
-
-//    coroutineScope.launch {
-//        if (viewModel.isLoggedIn(sharedPreferencesManager.getUserToken().toString())) {
-//            navController.navigate(CommunityListDestination.route);
-//            return;
-//        }
-//    }
 
     Scaffold(
         topBar = {
@@ -120,29 +101,21 @@ fun SignInScreen(
                         Column(modifier = Modifier.fillMaxWidth()) {
                             SignInContent(
                                 onSignInSubmitted = { email, password ->
-                                    Log.d("HOOD_ALERT_DEBUG", "onSignInSubmitted")
-
                                     coroutineScope.launch {
                                         viewModel.signIn(
                                             email = email,
                                             password = password,
                                             onSignInSuccess = { user ->
-                                                Log.d("HOOD_ALERT_DEBUG", "User is found!")
-
                                                 val token = sharedPreferencesManager.generateToken()
-                                                Log.d("HOOD_ALERT_DEBUG", "Token generated!")
                                                 sharedPreferencesManager.saveUserToken(token);
-                                                Log.d("HOOD_ALERT_DEBUG", "Token saved locally!")
 
                                                 coroutineScope.launch {
                                                     viewModel.saveSession(
                                                         user = user,
                                                         token = token
                                                     )
-                                                    Log.d("HOOD_ALERT_DEBUG", "Token saved in database!")
 
                                                     onSignInSuccess()
-                                                    Log.d("HOOD_ALERT_DEBUG", "Callback called!")
                                                 }
                                             },
                                             onSignInFailed = {
