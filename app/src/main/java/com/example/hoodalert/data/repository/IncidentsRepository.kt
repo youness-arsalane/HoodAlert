@@ -16,6 +16,6 @@ class IncidentsRepository(private val incidentDao: IncidentDao) {
 
     suspend fun deleteIncident(incident: Incident) = incidentDao.delete(incident)
 
-
-    fun findByCommunity(community: Community): Flow<List<Incident>> = incidentDao.findByCommunityId(community.id)
+    fun findByCommunity(community: Community): Flow<List<Incident>> =
+        incidentDao.findByCommunityId(community.id)
 }

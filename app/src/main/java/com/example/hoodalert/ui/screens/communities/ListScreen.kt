@@ -1,6 +1,7 @@
 package com.example.hoodalert.ui.screens.communities
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,8 +23,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -34,11 +39,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hoodalert.R
 import com.example.hoodalert.data.model.Community
+import com.example.hoodalert.data.model.User
 import com.example.hoodalert.ui.AppViewModelProvider
 import com.example.hoodalert.ui.components.HoodAlertTopAppBar
 import com.example.hoodalert.ui.navigation.NavigationDestination
 import com.example.hoodalert.ui.theme.HoodAlertTheme
 import com.example.hoodalert.ui.viewmodel.communities.CommunityListViewModel
+import com.example.hoodalert.ui.viewmodel.communities.isMember
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 object CommunityListDestination : NavigationDestination {
     override val route = "community_list"
@@ -49,8 +58,10 @@ object CommunityListDestination : NavigationDestination {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ListScreen(
+    loggedInUser: User?,
     navigateToCommunityEntry: () -> Unit,
     navigateToCommunityUpdate: (Int) -> Unit,
+    onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CommunityListViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
@@ -62,7 +73,8 @@ fun ListScreen(
         topBar = {
             HoodAlertTopAppBar(
                 title = stringResource(CommunityListDestination.titleRes),
-                canNavigateBack = false,
+                canNavigateBack = true,
+                navigateUp = onNavigateUp,
                 scrollBehavior = scrollBehavior
             )
         },
@@ -80,6 +92,8 @@ fun ListScreen(
         },
     ) { innerPadding ->
         ListBody(
+            loggedInUser = loggedInUser,
+            viewModel = viewModel,
             communityList = communityListUiState.communityList,
             onCommunityClick = navigateToCommunityUpdate,
             modifier = modifier
@@ -91,7 +105,11 @@ fun ListScreen(
 
 @Composable
 private fun ListBody(
-    communityList: List<Community>, onCommunityClick: (Int) -> Unit, modifier: Modifier = Modifier
+    loggedInUser: User?,
+    viewModel: CommunityListViewModel,
+    communityList: List<Community>,
+    onCommunityClick: (Int) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -105,6 +123,8 @@ private fun ListBody(
             )
         } else {
             HoodAlertList(
+                loggedInUser = loggedInUser,
+                viewModel = viewModel,
                 communityList = communityList,
                 onCommunityClick = { onCommunityClick(it.id) },
                 modifier = Modifier.padding(horizontal = 8.dp)
@@ -115,23 +135,45 @@ private fun ListBody(
 
 @Composable
 private fun HoodAlertList(
+    loggedInUser: User?,
+    viewModel: CommunityListViewModel,
     communityList: List<Community>,
     onCommunityClick: (Community) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier) {
         items(items = communityList, key = { it.id }) { community ->
-            HoodAlertCommunity(community = community,
+
+            var isMember by remember { mutableStateOf(false) }
+            LaunchedEffect(loggedInUser) {
+                Log.d("HOOD_ALERT_DEBUG", "LaunchedEffect")
+                Log.d("HOOD_ALERT_DEBUG", "User ID: " + loggedInUser?.id.toString())
+
+                withContext(Dispatchers.IO) {
+                    Log.d("HOOD_ALERT_DEBUG", "withContext")
+                    isMember = loggedInUser != null && community.isMember(viewModel, loggedInUser)
+                    Log.d("HOOD_ALERT_DEBUG", "isMember: $isMember")
+                }
+            }
+
+            HoodAlertCommunity(
+                community = community,
+                isMember = isMember,
                 modifier = Modifier
                     .padding(8.dp)
-                    .clickable { onCommunityClick(community) })
+                    .clickable {
+                        onCommunityClick(community)
+                    }
+            )
         }
     }
 }
 
 @Composable
 private fun HoodAlertCommunity(
-    community: Community, modifier: Modifier = Modifier
+    community: Community,
+    isMember: Boolean,
+    modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier, elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -148,6 +190,18 @@ private fun HoodAlertCommunity(
                     style = MaterialTheme.typography.titleLarge,
                 )
             }
+
+//            if (isMember) {
+//                Text(
+//                    text = "You are a member!",
+//                    color = Color.Green
+//                )
+//            } else {
+//                Text(
+//                    text = "You are not a member!",
+//                    color = Color.Red
+//                )
+//            }
         }
     }
 }
@@ -156,6 +210,5 @@ private fun HoodAlertCommunity(
 @Composable
 fun ListBodyEmptyListPreview() {
     HoodAlertTheme {
-        ListBody(listOf(), onCommunityClick = {})
     }
 }

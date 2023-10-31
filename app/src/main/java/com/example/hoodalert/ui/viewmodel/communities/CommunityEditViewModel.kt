@@ -6,13 +6,16 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.hoodalert.data.repository.CommunitiesRepository
+import com.example.hoodalert.data.AppContainer
 import com.example.hoodalert.ui.screens.communities.CommunityEditDestination
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class CommunityEditViewModel(savedStateHandle: SavedStateHandle, private val communitiesRepository: CommunitiesRepository) : ViewModel() {
+class CommunityEditViewModel(
+    savedStateHandle: SavedStateHandle,
+    private val appContainer: AppContainer
+) : ViewModel() {
     var communityUiState by mutableStateOf(CommunityUiState())
         private set
 
@@ -21,7 +24,7 @@ class CommunityEditViewModel(savedStateHandle: SavedStateHandle, private val com
 
     init {
         viewModelScope.launch {
-            communityUiState = communitiesRepository.getCommunityStream(communityId)
+            communityUiState = appContainer.communitiesRepository.getCommunityStream(communityId)
                 .filterNotNull()
                 .first()
                 .toCommunityUiState(true)
@@ -30,7 +33,7 @@ class CommunityEditViewModel(savedStateHandle: SavedStateHandle, private val com
 
     suspend fun updateCommunity() {
         if (validateInput(communityUiState.communityDetails)) {
-            communitiesRepository.updateCommunity(communityUiState.communityDetails.toCommunity())
+            appContainer.communitiesRepository.updateCommunity(communityUiState.communityDetails.toCommunity())
         }
     }
 

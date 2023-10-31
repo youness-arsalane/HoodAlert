@@ -128,3 +128,37 @@ fun InputForm(
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun InputForm2(
+    communityDetails: CommunityDetails,
+    modifier: Modifier = Modifier,
+    onValueChange: (CommunityDetails) -> Unit = {},
+    enabled: Boolean = true
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        OutlinedTextField(
+            value = communityDetails.name,
+            onValueChange = { onValueChange(communityDetails.copy(name = it)) },
+            label = { Text(stringResource(R.string.name)) },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+            ),
+            modifier = Modifier.fillMaxWidth(),
+            enabled = enabled,
+            singleLine = true
+        )
+        if (enabled) {
+            Text(
+                text = stringResource(R.string.required_fields),
+                modifier = Modifier.padding(start = 16.dp)
+            )
+        }
+    }
+}

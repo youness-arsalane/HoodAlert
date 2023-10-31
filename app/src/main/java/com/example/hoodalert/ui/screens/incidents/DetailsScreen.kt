@@ -41,6 +41,7 @@ import com.example.hoodalert.ui.components.HoodAlertTopAppBar
 import com.example.hoodalert.ui.navigation.NavigationDestination
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentDetailsUiState
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentDetailsViewModel
+import com.example.hoodalert.ui.viewmodel.incidents.getFullName
 import com.example.hoodalert.ui.viewmodel.incidents.toIncident
 import kotlinx.coroutines.launch
 
@@ -61,6 +62,7 @@ fun DetailsScreen(
 ) {
     val uiState = viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+
     Scaffold(
         topBar = {
             HoodAlertTopAppBar(
@@ -109,6 +111,7 @@ private fun DetailsBody(
     ) {
         var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
         Details(
+            incidentDetailsUiState = incidentDetailsUiState,
             incident = incidentDetailsUiState.incidentDetails.toIncident(),
             modifier = Modifier.fillMaxWidth()
         )
@@ -135,7 +138,9 @@ private fun DetailsBody(
 
 @Composable
 fun Details(
-    incident: Incident, modifier: Modifier = Modifier
+    incidentDetailsUiState: IncidentDetailsUiState,
+    incident: Incident,
+    modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier, colors = CardDefaults.cardColors(
@@ -149,6 +154,20 @@ fun Details(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            DetailsRow(
+                labelResID = R.string.community,
+                incidentDetail = incidentDetailsUiState.community?.name.toString(),
+                modifier = Modifier.padding(
+                    horizontal = 16.dp
+                )
+            )
+            DetailsRow(
+                labelResID = R.string.user,
+                incidentDetail = incidentDetailsUiState.user?.getFullName().toString(),
+                modifier = Modifier.padding(
+                    horizontal = 16.dp
+                )
+            )
             DetailsRow(
                 labelResID = R.string.incident,
                 incidentDetail = incident.title,

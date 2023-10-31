@@ -59,21 +59,21 @@ import com.example.hoodalert.ui.components.EmailStateSaver
 import com.example.hoodalert.ui.components.PasswordState
 import com.example.hoodalert.ui.components.TextFieldState
 import com.example.hoodalert.ui.navigation.NavigationDestination
-import com.example.hoodalert.ui.viewmodel.SignInViewModel
+import com.example.hoodalert.ui.viewmodel.LoginViewModel
 import com.example.hoodalert.util.supportWideScreen
 import kotlinx.coroutines.launch
 
-object SignInDestination : NavigationDestination {
+object LoginDestination : NavigationDestination {
     override val route = "sign_in"
     override val titleRes = R.string.app_name
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignInScreen(
-    viewModel: SignInViewModel = viewModel(factory = AppViewModelProvider.Factory),
+fun LoginScreen(
+    viewModel: LoginViewModel = viewModel(factory = AppViewModelProvider.Factory),
     navController: NavController,
-    onSignInSuccess: () -> Unit,
+    onLoginSuccess: () -> Unit,
     onRegister: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -82,7 +82,7 @@ fun SignInScreen(
 
     Scaffold(
         topBar = {
-            SignInTopAppBar(
+            LoginTopAppBar(
                 topAppBarText = stringResource(id = R.string.sign_in),
             )
         },
@@ -99,15 +99,15 @@ fun SignInScreen(
                             .padding(horizontal = 20.dp)
                     ) {
                         Column(modifier = Modifier.fillMaxWidth()) {
-                            SignInContent(
-                                onSignInSubmitted = { email, password ->
+                            LoginContent(
+                                onLoginSubmitted = { email, password ->
                                     coroutineScope.launch {
-                                        viewModel.signIn(
+                                        viewModel.login(
                                             email = email,
                                             password = password,
-                                            onSignInSuccess = { user ->
+                                            onLoginSuccess = { user ->
                                                 val token = sharedPreferencesManager.generateToken()
-                                                sharedPreferencesManager.saveUserToken(token);
+                                                sharedPreferencesManager.saveUserToken(token)
 
                                                 coroutineScope.launch {
                                                     viewModel.saveSession(
@@ -115,10 +115,10 @@ fun SignInScreen(
                                                         token = token
                                                     )
 
-                                                    onSignInSuccess()
+                                                    onLoginSuccess()
                                                 }
                                             },
-                                            onSignInFailed = {
+                                            onLoginFailed = {
                                                 Log.d("HOOD_ALERT_DEBUG", "User is not found")
                                             },
                                         )
@@ -145,7 +145,7 @@ fun SignInScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignInTopAppBar(
+fun LoginTopAppBar(
     topAppBarText: String,
 ) {
     CenterAlignedTopAppBar(
@@ -164,8 +164,8 @@ fun SignInTopAppBar(
 }
 
 @Composable
-fun SignInContent(
-    onSignInSubmitted: (email: String, password: String) -> Unit,
+fun LoginContent(
+    onLoginSubmitted: (email: String, password: String) -> Unit,
     onRegister: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -181,7 +181,7 @@ fun SignInContent(
 
         val onSubmit = {
             if (emailState.isValid && passwordState.isValid) {
-                onSignInSubmitted(emailState.text, passwordState.text)
+                onLoginSubmitted(emailState.text, passwordState.text)
             }
         }
         Password(

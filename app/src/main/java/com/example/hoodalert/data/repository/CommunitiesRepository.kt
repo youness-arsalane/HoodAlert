@@ -9,7 +9,7 @@ class CommunitiesRepository(private val communityDao: CommunityDao) {
 
     fun getCommunityStream(id: Int): Flow<Community?> = communityDao.getCommunity(id)
 
-    suspend fun insertCommunity(community: Community) :Int = communityDao.insert(community).toInt()
+    suspend fun insertCommunity(community: Community): Int = communityDao.insert(community).toInt()
 
     suspend fun updateCommunity(community: Community) = communityDao.update(community)
 

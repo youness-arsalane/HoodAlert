@@ -1,6 +1,5 @@
 package com.example.hoodalert.ui.navigation
 
-
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -11,15 +10,14 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.hoodalert.data.auth.SharedPreferencesManager
 import com.example.hoodalert.data.model.User
 import com.example.hoodalert.ui.AppViewModelProvider
 import com.example.hoodalert.ui.screens.DashboardDestination
 import com.example.hoodalert.ui.screens.DashboardScreen
+import com.example.hoodalert.ui.screens.LoginDestination
+import com.example.hoodalert.ui.screens.LoginScreen
 import com.example.hoodalert.ui.screens.RegisterDestination
 import com.example.hoodalert.ui.screens.RegisterScreen
-import com.example.hoodalert.ui.screens.SignInDestination
-import com.example.hoodalert.ui.screens.SignInScreen
 import com.example.hoodalert.ui.screens.communities.CommunityDetailsDestination
 import com.example.hoodalert.ui.screens.communities.CommunityEditDestination
 import com.example.hoodalert.ui.screens.communities.CommunityEntryDestination
@@ -28,7 +26,7 @@ import com.example.hoodalert.ui.screens.incidents.IncidentDetailsDestination
 import com.example.hoodalert.ui.screens.incidents.IncidentEditDestination
 import com.example.hoodalert.ui.screens.incidents.IncidentEntryDestination
 import com.example.hoodalert.ui.screens.incidents.IncidentListDestination
-import com.example.hoodalert.ui.viewmodel.SignInViewModel
+import com.example.hoodalert.ui.viewmodel.LoginViewModel
 import kotlinx.coroutines.launch
 import com.example.hoodalert.ui.screens.communities.DetailsScreen as CommunityDetailsScreen
 import com.example.hoodalert.ui.screens.communities.EditScreen as CommunityEditScreen
@@ -44,24 +42,26 @@ fun HoodAlertNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
-    val signInViewModel: SignInViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    val loginViewModel: LoginViewModel = viewModel(factory = AppViewModelProvider.Factory)
 
     NavHost(
         navController = navController,
-        startDestination = SignInDestination.route,
+        startDestination = LoginDestination.route,
         modifier = modifier
     ) {
-        var loggedInUser : User? = null
-        signInViewModel.viewModelScope.launch {
-            loggedInUser = signInViewModel.getLoggedInUser()
-            if (loggedInUser !== null) {
-                navController.navigate(DashboardDestination.route);
+        var loggedInUser: User? = null
+        loginViewModel.viewModelScope.launch {
+            try {
+                loggedInUser = loginViewModel.getLoggedInUser()
+                navController.navigate(DashboardDestination.route)
+            } catch (_: Exception) {
             }
         }
-        composable(route = SignInDestination.route) {
-            SignInScreen(
+
+        composable(route = LoginDestination.route) {
+            LoginScreen(
                 navController = navController,
-                onSignInSuccess = { navController.navigate(DashboardDestination.route) },
+                onLoginSuccess = { navController.navigate(DashboardDestination.route) },
                 onRegister = { navController.navigate(RegisterDestination.route) }
             )
         }
@@ -75,15 +75,20 @@ fun HoodAlertNavHost(
             DashboardScreen(
                 navController = navController,
                 loggedInUser = loggedInUser,
-                onNavUp = navController::navigateUp,
+                onLogout = {
+                    loginViewModel.logout()
+                    navController.navigate(LoginDestination.route)
+                },
             )
         }
         composable(route = CommunityListDestination.route) {
             CommunityListScreen(
+                loggedInUser = loggedInUser,
                 navigateToCommunityEntry = { navController.navigate(CommunityEntryDestination.route) },
                 navigateToCommunityUpdate = {
                     navController.navigate("${CommunityDetailsDestination.route}/${it}")
-                }
+                },
+                onNavigateUp = { navController.navigateUp() }
             )
         }
         composable(route = CommunityEntryDestination.route) {
@@ -98,8 +103,12 @@ fun HoodAlertNavHost(
                 type = NavType.IntType
             })
         ) {
+            val communityId = it.arguments?.getInt(CommunityDetailsDestination.communityIdArg) ?: 0;
+
             CommunityDetailsScreen(
                 navigateToEditCommunity = { navController.navigate("${CommunityEditDestination.route}/$it") },
+                navigateToIncidentEntry = { navController.navigate("${IncidentEntryDestination.route}/$communityId") },
+                navigateToIncidentUpdate = { navController.navigate("${IncidentDetailsDestination.route}/${it}") },
                 loggedInUser = loggedInUser,
                 navigateBack = { navController.navigateUp() }
             )
@@ -120,10 +129,16 @@ fun HoodAlertNavHost(
                 navigateToIncidentEntry = { navController.navigate(IncidentEntryDestination.route) },
                 navigateToIncidentUpdate = {
                     navController.navigate("${IncidentDetailsDestination.route}/${it}")
-                }
+                },
+                onNavigateUp = { navController.navigateUp() }
             )
         }
-        composable(route = IncidentEntryDestination.route) {
+        composable(
+            route = IncidentEntryDestination.routeWithArgs,
+            arguments = listOf(navArgument(IncidentEntryDestination.communityIdArg) {
+                type = NavType.IntType
+            })
+        ) {
             IncidentEntryScreen(
                 navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() }

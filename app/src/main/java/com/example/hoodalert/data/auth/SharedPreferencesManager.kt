@@ -3,7 +3,7 @@ package com.example.hoodalert.data.auth
 import android.content.Context
 import android.content.SharedPreferences
 
-private const val USER_TOKEN_KEY = "userToken";
+private const val USER_TOKEN_KEY = "userToken"
 
 class SharedPreferencesManager(private val context: Context) {
     private val sharedPreferences: SharedPreferences =

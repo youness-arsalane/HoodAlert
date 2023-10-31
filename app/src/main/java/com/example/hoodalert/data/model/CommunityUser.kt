@@ -35,6 +35,9 @@ data class CommunityUser(
     @ColumnInfo(name = "user_id")
     val userId: Int,
 
+    @ColumnInfo(name = "is_admin")
+    val isAdmin: Boolean,
+
     @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
     val createdAt: Date,
 

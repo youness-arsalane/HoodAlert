@@ -1,16 +1,18 @@
 package com.example.hoodalert.ui.screens.communities
 
-import android.util.Log
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
@@ -22,7 +24,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -31,26 +32,32 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hoodalert.R
-import com.example.hoodalert.data.model.Community
 import com.example.hoodalert.data.model.CommunityUser
+import com.example.hoodalert.data.model.Incident
 import com.example.hoodalert.data.model.User
 import com.example.hoodalert.ui.AppViewModelProvider
 import com.example.hoodalert.ui.components.HoodAlertTopAppBar
 import com.example.hoodalert.ui.navigation.NavigationDestination
+import com.example.hoodalert.ui.theme.HoodAlertTheme
 import com.example.hoodalert.ui.viewmodel.communities.CommunityDetailsUiState
 import com.example.hoodalert.ui.viewmodel.communities.CommunityDetailsViewModel
+import com.example.hoodalert.ui.viewmodel.communities.getIncidents
 import com.example.hoodalert.ui.viewmodel.communities.toCommunity
 import kotlinx.coroutines.launch
+import java.util.Date
 
 object CommunityDetailsDestination : NavigationDestination {
     override val route = "community_details"
@@ -63,6 +70,8 @@ object CommunityDetailsDestination : NavigationDestination {
 @Composable
 fun DetailsScreen(
     navigateToEditCommunity: (Int) -> Unit,
+    navigateToIncidentEntry: () -> Unit,
+    navigateToIncidentUpdate: (Int) -> Unit,
     loggedInUser: User?,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -70,12 +79,11 @@ fun DetailsScreen(
 ) {
     val uiState = viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+    var communityUser by remember { mutableStateOf<CommunityUser?>(null) }
 
-    val community = uiState.value.communityDetails.toCommunity();
+    val community = uiState.value.communityDetails.toCommunity()
 
-    /* TODO: find out why community user is empty */
-    var communityUser : CommunityUser? = null;
-    LaunchedEffect(viewModel) {
+    LaunchedEffect(community) {
         communityUser = viewModel.findCommunityUser(loggedInUser)
     }
 
@@ -86,77 +94,113 @@ fun DetailsScreen(
                 canNavigateBack = true,
                 navigateUp = navigateBack,
                 actions = {
-                    IconButton(
-                        onClick = {
-                            coroutineScope.launch {
-                                viewModel.deleteCommunity()
-                                navigateBack()
-                            }
+                    if (communityUser != null && communityUser!!.isAdmin) {
+                        IconButton(onClick = { navigateToEditCommunity(uiState.value.communityDetails.id) }) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = stringResource(R.string.edit_community_title)
+                            )
                         }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Delete,
-                            contentDescription = stringResource(id = R.string.delete),
-                            tint = MaterialTheme.colorScheme.error
-                        )
+                        IconButton(
+                            onClick = {
+                                coroutineScope.launch {
+                                    viewModel.deleteCommunity()
+                                    navigateBack()
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = stringResource(id = R.string.delete),
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
                     }
                 }
             )
         }, floatingActionButton = {
             FloatingActionButton(
-                onClick = { navigateToEditCommunity(uiState.value.communityDetails.id) },
+                onClick = navigateToIncidentEntry,
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.padding(20.dp)
 
             ) {
                 Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = stringResource(R.string.edit_community_title),
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(R.string.incident_entry_title)
                 )
             }
         }, modifier = modifier
     ) { innerPadding ->
         DetailsBody(
+            viewModel = viewModel,
+            navigateToIncidentUpdate = navigateToIncidentUpdate,
             communityDetailsUiState = uiState.value,
-            onJoinCommunity = { },
+            modifier = Modifier
+                .padding(innerPadding),
             communityUser = communityUser,
+            onJoinCommunity = {
+                val newCommunityUser = CommunityUser(
+                    id = 0,
+                    communityId = uiState.value.communityDetails.toCommunity().id,
+                    userId = loggedInUser!!.id,
+                    isAdmin = true,
+                    createdAt = Date(),
+                    updatedAt = Date()
+                )
+
+                coroutineScope.launch {
+                    viewModel.insertCommunityUser(newCommunityUser)
+                    navigateBack()
+                }
+            },
+            onLeaveCommunity = {
+                coroutineScope.launch {
+                    viewModel.deleteCommunityUser(communityUser!!)
+                    navigateBack()
+                }
+            },
             onDelete = {
                 coroutineScope.launch {
                     viewModel.deleteCommunity()
                     navigateBack()
                 }
-            },
-            modifier = Modifier
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
+            }
         )
     }
 }
 
 @Composable
 private fun DetailsBody(
+    viewModel: CommunityDetailsViewModel,
+    navigateToIncidentUpdate: (Int) -> Unit,
     communityDetailsUiState: CommunityDetailsUiState,
+    modifier: Modifier = Modifier,
+    communityUser: CommunityUser?,
     onJoinCommunity: () -> Unit,
-    communityUser: CommunityUser? = null,
+    onLeaveCommunity: () -> Unit,
     onDelete: () -> Unit,
-    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
-        Details(
-            community = communityDetailsUiState.communityDetails.toCommunity(),
-            modifier = Modifier.fillMaxWidth()
-        )
-        if (communityUser == null) {
+
+        val community = communityDetailsUiState.communityDetails.toCommunity()
+
+        var incidentList by remember { mutableStateOf(emptyList<Incident>()) }
+        LaunchedEffect(community) {
+            incidentList = community.getIncidents(viewModel)
+        }
+
+        if (communityUser != null) {
             Button(
-                onClick = onJoinCommunity,
+                onClick = onLeaveCommunity,
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.small
             ) {
-                Text(stringResource(R.string.join))
+                Text(stringResource(R.string.leave))
             }
         } else {
             Button(
@@ -164,18 +208,18 @@ private fun DetailsBody(
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.small
             ) {
-                Text(stringResource(R.string.leave))
+                Text(stringResource(R.string.join))
             }
         }
 
-        OutlinedButton(
-            onClick = { deleteConfirmationRequired = true },
-            shape = MaterialTheme.shapes.small,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(stringResource(R.string.delete))
-        }
-        if (deleteConfirmationRequired) {
+        ListBody(
+            incidentList = incidentList,
+            onIncidentClick = navigateToIncidentUpdate,
+            modifier = modifier
+                .fillMaxSize()
+        )
+
+        if (communityUser != null && communityUser.isAdmin && deleteConfirmationRequired) {
             DeleteConfirmationDialog(
                 onDeleteConfirm = {
                     deleteConfirmationRequired = false
@@ -188,38 +232,74 @@ private fun DetailsBody(
     }
 }
 
-
 @Composable
-fun Details(
-    community: Community, modifier: Modifier = Modifier
+private fun ListBody(
+    incidentList: List<Incident>, onIncidentClick: (Int) -> Unit, modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier, colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-        )
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            DetailsRow(
-                labelResID = R.string.community,
-                communityDetail = community.name,
-                modifier = Modifier.padding(
-                    horizontal = 16.dp
-                )
+        if (incidentList.isEmpty()) {
+            Text(
+                text = stringResource(R.string.no_incident_description),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleLarge
+            )
+        } else {
+            IncidentList(
+                incidentList = incidentList,
+                onIncidentClick = { onIncidentClick(it.id) },
+                modifier = Modifier.padding(horizontal = 8.dp)
             )
         }
+    }
+}
 
+@Composable
+private fun IncidentList(
+    incidentList: List<Incident>, onIncidentClick: (Incident) -> Unit, modifier: Modifier = Modifier
+) {
+    LazyColumn(modifier = modifier) {
+        items(items = incidentList, key = { it.id }) { incident ->
+            Incident(incident = incident,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .clickable { onIncidentClick(incident) })
+        }
+    }
+}
+
+@Composable
+private fun Incident(
+    incident: Incident,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier, elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = incident.title,
+                    style = MaterialTheme.typography.titleLarge,
+                )
+            }
+            Text(text = incident.description)
+        }
     }
 }
 
 @Composable
 private fun DetailsRow(
-    @StringRes labelResID: Int, communityDetail: String, modifier: Modifier = Modifier
+    @StringRes labelResID: Int,
+    communityDetail: String,
+    modifier: Modifier = Modifier
 ) {
     Row(modifier = modifier) {
         Text(text = stringResource(labelResID))
@@ -246,4 +326,25 @@ private fun DeleteConfirmationDialog(
                 Text(text = stringResource(R.string.yes))
             }
         })
+}
+
+@Preview
+@Composable
+fun DetailsScreenPreview() {
+    HoodAlertTheme {
+        DetailsScreen(
+            navigateToEditCommunity = {},
+            navigateToIncidentEntry = {},
+            navigateToIncidentUpdate = {},
+            loggedInUser = User(
+                id = 0,
+                email = "test@test.com",
+                firstName = "Test",
+                lastName = "Test",
+                password = "",
+                createdAt = Date(),
+                updatedAt = Date(),
+            ),
+            navigateBack = { /*TODO*/ })
+    }
 }

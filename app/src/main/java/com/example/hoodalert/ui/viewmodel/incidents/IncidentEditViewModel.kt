@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.hoodalert.data.repository.IncidentsRepository
+import com.example.hoodalert.data.AppContainer
 import com.example.hoodalert.ui.screens.incidents.IncidentEditDestination
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 class IncidentEditViewModel(
     savedStateHandle: SavedStateHandle,
-    private val incidentsRepository: IncidentsRepository
+    private val appContainer: AppContainer
 ) : ViewModel() {
     var incidentUiState by mutableStateOf(IncidentUiState())
         private set
@@ -24,16 +24,29 @@ class IncidentEditViewModel(
 
     init {
         viewModelScope.launch {
-            incidentUiState = incidentsRepository.getIncidentStream(incidentId)
+            val incident = appContainer.incidentsRepository.getIncidentStream(incidentId)
                 .filterNotNull()
                 .first()
-                .toIncidentUiState(true)
+
+            val community =
+                appContainer.communitiesRepository.getCommunityStream(incident.communityId)
+                    .filterNotNull()
+                    .first()
+
+            val user =
+                appContainer.usersRepository.getUserStream(incident.userId)
+                    .filterNotNull()
+                    .first()
+
+            incidentUiState = incident.toIncidentUiState(true)
+            incidentUiState.community = community
+            incidentUiState.user = user
         }
     }
 
     suspend fun updateIncident() {
         if (validateInput(incidentUiState.incidentDetails)) {
-            incidentsRepository.updateIncident(incidentUiState.incidentDetails.toIncident())
+            appContainer.incidentsRepository.updateIncident(incidentUiState.incidentDetails.toIncident())
         }
     }
 

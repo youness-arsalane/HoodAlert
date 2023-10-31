@@ -21,11 +21,12 @@ class UsersRepository(private val userDao: UserDao, private val context: Context
 
     suspend fun deleteUser(user: User) = userDao.delete(user)
 
-    suspend fun getLoggedInUser(): User? {
+    suspend fun getLoggedInUser(): User {
         val sharedPreferencesManager = SharedPreferencesManager(context)
         val token: String = sharedPreferencesManager.getUserToken().toString()
 
-        val userSessionDao = HoodAlertDatabase.DatabaseInstance.getInstance(context).userSessionDao()
+        val userSessionDao =
+            HoodAlertDatabase.DatabaseInstance.getInstance(context).userSessionDao()
         val userDao = HoodAlertDatabase.DatabaseInstance.getInstance(context).userDao()
 
         var loggedInUser: User? = null
@@ -35,6 +36,15 @@ class UsersRepository(private val userDao: UserDao, private val context: Context
             loggedInUser = userDao.getUser(userSession.userId).firstOrNull()
         }
 
-        return loggedInUser;
+        if (loggedInUser === null) {
+            throw Exception("User is not logged in!")
+        }
+
+        return loggedInUser
+    }
+
+    fun logout() {
+        val sharedPreferencesManager = SharedPreferencesManager(context)
+        sharedPreferencesManager.saveUserToken("")
     }
 }

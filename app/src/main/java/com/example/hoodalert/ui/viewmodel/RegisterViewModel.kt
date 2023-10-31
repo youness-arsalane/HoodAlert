@@ -5,11 +5,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.hoodalert.data.AppContainer
 import com.example.hoodalert.data.model.User
-import com.example.hoodalert.data.repository.UsersRepository
 import java.util.Date
 
-class RegisterViewModel(private val usersRepository: UsersRepository) : ViewModel() {
+class RegisterViewModel(private val appContainer: AppContainer) : ViewModel() {
     var userUiState by mutableStateOf(UserUiState())
         private set
 
@@ -23,7 +23,7 @@ class RegisterViewModel(private val usersRepository: UsersRepository) : ViewMode
 
     suspend fun saveUser() {
         if (validateInput()) {
-            usersRepository.insertUser(userUiState.userDetails.toUser())
+            appContainer.usersRepository.insertUser(userUiState.userDetails.toUser())
         }
     }
 

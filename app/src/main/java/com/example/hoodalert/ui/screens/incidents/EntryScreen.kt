@@ -31,6 +31,8 @@ import kotlinx.coroutines.launch
 object IncidentEntryDestination : NavigationDestination {
     override val route = "incident_entry"
     override val titleRes = R.string.incident_entry_title
+    const val communityIdArg = "communityId"
+    val routeWithArgs = "${route}/{$communityIdArg}"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,6 +81,8 @@ fun EntryBody(
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
+        Text(text = "Community: " + incidentUiState.community?.name.toString())
+
         InputForm(
             incidentDetails = incidentUiState.incidentDetails,
             onValueChange = onIncidentValueChange,

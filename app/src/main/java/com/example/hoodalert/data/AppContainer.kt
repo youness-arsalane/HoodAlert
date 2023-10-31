@@ -1,9 +1,6 @@
 package com.example.hoodalert.data
 
 import android.content.Context
-import android.util.Log
-import com.example.hoodalert.data.auth.SharedPreferencesManager
-import com.example.hoodalert.data.model.User
 import com.example.hoodalert.data.repository.CommunitiesRepository
 import com.example.hoodalert.data.repository.CommunityUsersRepository
 import com.example.hoodalert.data.repository.IncidentsRepository

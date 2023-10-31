@@ -19,7 +19,7 @@ interface CommunityUserDao {
     @Query("SELECT * FROM community_users WHERE id = :id")
     fun getCommunityUser(id: Int): Flow<CommunityUser>
 
-    @Query("SELECT * FROM community_users WHERE community_id = :communityId AND community_id = :userId")
+    @Query("SELECT * FROM community_users WHERE community_id = :communityId AND user_id = :userId")
     fun findByCommunityIdAndUserId(communityId: Int, userId: Int): Flow<CommunityUser>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)

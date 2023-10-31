@@ -51,6 +51,7 @@ object IncidentListDestination : NavigationDestination {
 fun ListScreen(
     navigateToIncidentEntry: () -> Unit,
     navigateToIncidentUpdate: (Int) -> Unit,
+    onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: IncidentListViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
@@ -62,7 +63,8 @@ fun ListScreen(
         topBar = {
             HoodAlertTopAppBar(
                 title = stringResource(IncidentListDestination.titleRes),
-                canNavigateBack = false,
+                canNavigateBack = true,
+                navigateUp = onNavigateUp,
                 scrollBehavior = scrollBehavior
             )
         },
@@ -129,7 +131,8 @@ private fun HoodAlertList(
 
 @Composable
 private fun HoodAlertIncident(
-    incident: Incident, modifier: Modifier = Modifier
+    incident: Incident,
+    modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier, elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -146,6 +149,7 @@ private fun HoodAlertIncident(
                     style = MaterialTheme.typography.titleLarge,
                 )
             }
+            Text(text = incident.description)
         }
     }
 }
