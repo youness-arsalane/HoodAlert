@@ -13,13 +13,13 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface UserDao {
 
-    @Query("SELECT * from users")
+    @Query("SELECT * FROM users")
     fun getAllUsers(): Flow<List<User>>
 
-    @Query("SELECT * from users WHERE id = :id")
+    @Query("SELECT * FROM users WHERE id = :id")
     fun getUser(id: Int): Flow<User>
 
-    @Query("SELECT * from users WHERE email = :email")
+    @Query("SELECT * FROM users WHERE email = :email")
     fun getUserByEmail(email: String): Flow<User>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)

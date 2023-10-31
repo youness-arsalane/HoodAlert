@@ -1,5 +1,6 @@
 package com.example.hoodalert.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.hoodalert.data.model.User
 import com.example.hoodalert.data.model.UserSession
@@ -43,11 +44,5 @@ class SignInViewModel(
         userSessionsRepository.insertUserSession(userSession)
     }
 
-    suspend fun isLoggedIn(token: String): Boolean {
-        return userSessionsRepository.findUserSessionByToken(token) != null;
-    }
-
-    fun getUserSessionByToken(token: String): Flow<UserSession?> {
-        return userSessionsRepository.getUserSessionByToken(token);
-    }
+    suspend fun getLoggedInUser() : User? = usersRepository.getLoggedInUser()
 }

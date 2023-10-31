@@ -1,12 +1,14 @@
 package com.example.hoodalert.data.repository
 
+import android.content.Context
+import com.example.hoodalert.data.HoodAlertDatabase
+import com.example.hoodalert.data.auth.SharedPreferencesManager
 import com.example.hoodalert.data.dao.UserDao
 import com.example.hoodalert.data.model.User
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.count
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 
-class UsersRepository(private val userDao: UserDao) {
+class UsersRepository(private val userDao: UserDao, private val context: Context) {
     fun getAllUsersStream(): Flow<List<User>> = userDao.getAllUsers()
 
     fun getUserStream(id: Int): Flow<User?> = userDao.getUser(id)
@@ -19,14 +21,20 @@ class UsersRepository(private val userDao: UserDao) {
 
     suspend fun deleteUser(user: User) = userDao.delete(user)
 
-    suspend fun findUserByCredentials(email: String, password: String): User? {
-        val user = userDao.getUserByEmail(email);
-        if (user.count() == 0) {
-            return null;
-        } else if (user.first().password != password) {
-            return null;
+    suspend fun getLoggedInUser(): User? {
+        val sharedPreferencesManager = SharedPreferencesManager(context)
+        val token: String = sharedPreferencesManager.getUserToken().toString()
+
+        val userSessionDao = HoodAlertDatabase.DatabaseInstance.getInstance(context).userSessionDao()
+        val userDao = HoodAlertDatabase.DatabaseInstance.getInstance(context).userDao()
+
+        var loggedInUser: User? = null
+
+        val userSession = userSessionDao.getUserSessionByToken(token).firstOrNull()
+        if (userSession !== null) {
+            loggedInUser = userDao.getUser(userSession.userId).firstOrNull()
         }
 
-        return user.first();
+        return loggedInUser;
     }
 }

@@ -13,10 +13,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface IncidentImageDao {
 
-    @Query("SELECT * from incident_images")
+    @Query("SELECT * FROM incident_images")
     fun getAllIncidentImages(): Flow<List<IncidentImage>>
 
-    @Query("SELECT * from incident_images WHERE id = :id")
+    @Query("SELECT * FROM incident_images WHERE id = :id")
     fun getIncidentImage(id: Int): Flow<IncidentImage>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)

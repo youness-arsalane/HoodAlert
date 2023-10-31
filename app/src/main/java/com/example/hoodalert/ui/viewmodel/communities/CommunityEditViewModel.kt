@@ -12,10 +12,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class CommunityEditViewModel(
-    savedStateHandle: SavedStateHandle,
-    private val communitiesRepository: CommunitiesRepository
-) : ViewModel() {
+class CommunityEditViewModel(savedStateHandle: SavedStateHandle, private val communitiesRepository: CommunitiesRepository) : ViewModel() {
     var communityUiState by mutableStateOf(CommunityUiState())
         private set
 

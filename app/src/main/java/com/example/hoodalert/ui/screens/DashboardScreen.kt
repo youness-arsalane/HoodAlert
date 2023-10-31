@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.hoodalert.MainActivity
 import com.example.hoodalert.R
+import com.example.hoodalert.data.model.User
 import com.example.hoodalert.ui.navigation.NavigationDestination
 import com.example.hoodalert.ui.screens.communities.CommunityListDestination
 import com.example.hoodalert.ui.theme.HoodAlertTheme
@@ -38,6 +39,7 @@ object DashboardDestination : NavigationDestination {
 @Composable
 fun DashboardScreen(
     navController: NavController,
+    loggedInUser: User?,
     onNavUp: () -> Unit
 ) {
     Scaffold(
@@ -56,6 +58,8 @@ fun DashboardScreen(
                     Button(onClick = { navController.navigate(CommunityListDestination.route) }) {
                         Text(text = "Communities")
                     }
+                    Text(text = "Email")
+                    Text(text = loggedInUser?.email.toString())
                 }
             }
         }
@@ -90,17 +94,4 @@ fun DashboardTopAppBar(
             Spacer(modifier = Modifier.width(68.dp))
         },
     )
-}
-
-@Preview(name = "Dashboard")
-@Composable
-fun DashboardScreenPreview() {
-    val context = MainActivity();
-
-    HoodAlertTheme {
-        DashboardScreen(
-            navController = NavController(context),
-            onNavUp = {}
-        )
-    }
 }

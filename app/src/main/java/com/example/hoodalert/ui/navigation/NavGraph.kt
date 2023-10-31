@@ -1,6 +1,7 @@
 package com.example.hoodalert.ui.navigation
 
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewModelScope
@@ -11,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.hoodalert.data.auth.SharedPreferencesManager
+import com.example.hoodalert.data.model.User
 import com.example.hoodalert.ui.AppViewModelProvider
 import com.example.hoodalert.ui.screens.DashboardDestination
 import com.example.hoodalert.ui.screens.DashboardScreen
@@ -43,22 +45,19 @@ fun HoodAlertNavHost(
     modifier: Modifier = Modifier,
 ) {
     val signInViewModel: SignInViewModel = viewModel(factory = AppViewModelProvider.Factory)
-    val sharedPreferencesManager = SharedPreferencesManager(navController.context)
 
     NavHost(
         navController = navController,
         startDestination = SignInDestination.route,
         modifier = modifier
     ) {
+        var loggedInUser : User? = null
         signInViewModel.viewModelScope.launch {
-            val token: String = sharedPreferencesManager.getUserToken().toString();
-            signInViewModel.getUserSessionByToken(token).collect { userSession ->
-                if (userSession != null) {
-                    navController.navigate(DashboardDestination.route);
-                }
+            loggedInUser = signInViewModel.getLoggedInUser()
+            if (loggedInUser !== null) {
+                navController.navigate(DashboardDestination.route);
             }
         }
-
         composable(route = SignInDestination.route) {
             SignInScreen(
                 navController = navController,
@@ -75,6 +74,7 @@ fun HoodAlertNavHost(
         composable(route = DashboardDestination.route) {
             DashboardScreen(
                 navController = navController,
+                loggedInUser = loggedInUser,
                 onNavUp = navController::navigateUp,
             )
         }
@@ -100,6 +100,7 @@ fun HoodAlertNavHost(
         ) {
             CommunityDetailsScreen(
                 navigateToEditCommunity = { navController.navigate("${CommunityEditDestination.route}/$it") },
+                loggedInUser = loggedInUser,
                 navigateBack = { navController.navigateUp() }
             )
         }

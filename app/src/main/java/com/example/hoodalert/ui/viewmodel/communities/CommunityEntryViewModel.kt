@@ -6,11 +6,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.hoodalert.data.model.Community
+import com.example.hoodalert.data.model.CommunityUser
+import com.example.hoodalert.data.model.User
 import com.example.hoodalert.data.repository.CommunitiesRepository
+import com.example.hoodalert.data.repository.CommunityUsersRepository
+import com.example.hoodalert.data.repository.UsersRepository
+import kotlinx.coroutines.flow.firstOrNull
 import java.util.Date
 
-class CommunityEntryViewModel(private val communitiesRepository: CommunitiesRepository) :
-    ViewModel() {
+class CommunityEntryViewModel(
+    private val communitiesRepository: CommunitiesRepository,
+    private val communityUsersRepository: CommunityUsersRepository,
+    private val usersRepository: UsersRepository
+) : ViewModel() {
     var communityUiState by mutableStateOf(CommunityUiState())
         private set
 
@@ -24,7 +32,23 @@ class CommunityEntryViewModel(private val communitiesRepository: CommunitiesRepo
 
     suspend fun saveCommunity() {
         if (validateInput()) {
-            communitiesRepository.insertCommunity(communityUiState.communityDetails.toCommunity())
+            val community = communityUiState.communityDetails.toCommunity();
+            val communityId = communitiesRepository.insertCommunity(community)
+
+            val loggedInUser = usersRepository.getLoggedInUser()
+            if (loggedInUser === null) {
+                throw Exception("User is not logged in!")
+            }
+
+            val communityUser = CommunityUser(
+                id = 0,
+                communityId = communityId,
+                userId = loggedInUser.id,
+                createdAt = Date(),
+                updatedAt = Date()
+            )
+
+            communityUsersRepository.insertCommunityUser(communityUser)
         }
     }
 

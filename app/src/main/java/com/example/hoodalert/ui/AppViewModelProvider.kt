@@ -39,13 +39,18 @@ object AppViewModelProvider {
         }
 
         initializer {
-            CommunityEntryViewModel(hoodAlertApplication().container.communitiesRepository)
+            CommunityEntryViewModel(
+                hoodAlertApplication().container.communitiesRepository,
+                hoodAlertApplication().container.communityUsersRepository,
+                hoodAlertApplication().container.usersRepository
+            )
         }
 
         initializer {
             CommunityDetailsViewModel(
                 this.createSavedStateHandle(),
-                hoodAlertApplication().container.communitiesRepository
+                hoodAlertApplication().container.communitiesRepository,
+                hoodAlertApplication().container.communityUsersRepository
             )
         }
 

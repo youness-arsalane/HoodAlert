@@ -13,14 +13,14 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface UserSessionDao {
 
-    @Query("SELECT * from user_sessions")
+    @Query("SELECT * FROM user_sessions")
     fun getAllUserSessions(): Flow<List<UserSession>>
 
-    @Query("SELECT * from user_sessions WHERE id = :id")
+    @Query("SELECT * FROM user_sessions WHERE id = :id")
     fun getUserSession(id: Int): Flow<UserSession>
 
-    @Query("SELECT * from user_sessions WHERE token = :token")
-    fun getUserSessionByToken(token: String): Flow<UserSession>
+    @Query("SELECT * FROM user_sessions WHERE token = :token")
+    fun getUserSessionByToken(token: String): Flow<UserSession?>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(userSession: UserSession)

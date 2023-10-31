@@ -1,5 +1,6 @@
 package com.example.hoodalert.ui.screens.communities
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,9 +38,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hoodalert.R
 import com.example.hoodalert.data.model.Community
+import com.example.hoodalert.data.model.CommunityUser
+import com.example.hoodalert.data.model.User
 import com.example.hoodalert.ui.AppViewModelProvider
 import com.example.hoodalert.ui.components.HoodAlertTopAppBar
 import com.example.hoodalert.ui.navigation.NavigationDestination
@@ -58,6 +63,7 @@ object CommunityDetailsDestination : NavigationDestination {
 @Composable
 fun DetailsScreen(
     navigateToEditCommunity: (Int) -> Unit,
+    loggedInUser: User?,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CommunityDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -66,6 +72,12 @@ fun DetailsScreen(
     val coroutineScope = rememberCoroutineScope()
 
     val community = uiState.value.communityDetails.toCommunity();
+
+    /* TODO: find out why community user is empty */
+    var communityUser : CommunityUser? = null;
+    LaunchedEffect(viewModel) {
+        communityUser = viewModel.findCommunityUser(loggedInUser)
+    }
 
     Scaffold(
         topBar = {
@@ -107,6 +119,7 @@ fun DetailsScreen(
         DetailsBody(
             communityDetailsUiState = uiState.value,
             onJoinCommunity = { },
+            communityUser = communityUser,
             onDelete = {
                 coroutineScope.launch {
                     viewModel.deleteCommunity()
@@ -124,6 +137,7 @@ fun DetailsScreen(
 private fun DetailsBody(
     communityDetailsUiState: CommunityDetailsUiState,
     onJoinCommunity: () -> Unit,
+    communityUser: CommunityUser? = null,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -136,13 +150,24 @@ private fun DetailsBody(
             community = communityDetailsUiState.communityDetails.toCommunity(),
             modifier = Modifier.fillMaxWidth()
         )
-        Button(
-            onClick = onJoinCommunity,
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.small
-        ) {
-            Text(stringResource(R.string.join))
+        if (communityUser == null) {
+            Button(
+                onClick = onJoinCommunity,
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.small
+            ) {
+                Text(stringResource(R.string.join))
+            }
+        } else {
+            Button(
+                onClick = onJoinCommunity,
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.small
+            ) {
+                Text(stringResource(R.string.leave))
+            }
         }
+
         OutlinedButton(
             onClick = { deleteConfirmationRequired = true },
             shape = MaterialTheme.shapes.small,

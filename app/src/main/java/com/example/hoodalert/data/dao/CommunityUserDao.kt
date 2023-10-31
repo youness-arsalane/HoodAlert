@@ -13,11 +13,14 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CommunityUserDao {
 
-    @Query("SELECT * from community_users")
+    @Query("SELECT * FROM community_users")
     fun getAllCommunityUsers(): Flow<List<CommunityUser>>
 
-    @Query("SELECT * from community_users WHERE id = :id")
+    @Query("SELECT * FROM community_users WHERE id = :id")
     fun getCommunityUser(id: Int): Flow<CommunityUser>
+
+    @Query("SELECT * FROM community_users WHERE community_id = :communityId AND community_id = :userId")
+    fun findByCommunityIdAndUserId(communityId: Int, userId: Int): Flow<CommunityUser>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(communityUser: CommunityUser)

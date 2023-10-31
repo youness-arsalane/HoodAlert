@@ -20,7 +20,7 @@ interface CommunityDao {
     fun getCommunity(id: Int): Flow<Community>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(community: Community)
+    suspend fun insert(community: Community): Long
 
     @Update
     suspend fun update(community: Community)
