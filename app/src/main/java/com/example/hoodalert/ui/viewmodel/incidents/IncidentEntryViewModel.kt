@@ -48,15 +48,21 @@ class IncidentEntryViewModel(
 
     suspend fun saveIncident() {
         if (validateInput()) {
-            val incident = incidentUiState.incidentDetails.toIncident()
+            var incident = incidentUiState.incidentDetails.toIncident()
 
             if (incident.id == 0) {
                 appContainer.getCurrentLocation { location ->
                     Log.d("HOOD_ALERT_DEBUG", "Location:")
                     Log.d("HOOD_ALERT_DEBUG", location.toString())
+
                     if (location != null) {
-                        incident.latitude = location.first.toLong()
-                        incident.longitude = location.second.toLong()
+                        incident = incidentUiState.incidentDetails.toIncident(
+                            specificLatitude = location.first.toLong(),
+                            specificLongitude = location.second.toLong()
+                        )
+                        Log.d("HOOD_ALERT_DEBUG", "Location:")
+                        Log.d("HOOD_ALERT_DEBUG", incident.latitude.toString())
+                        Log.d("HOOD_ALERT_DEBUG", incident.longitude.toString())
                     }
 
                     runBlocking {
@@ -88,10 +94,17 @@ data class IncidentDetails(
     val communityId: Int = 0,
     val userId: Int = 0,
     val title: String = "",
-    val description: String = ""
+    val description: String = "",
+    val latitude: Long? = null,
+    val longitude: Long? = null,
 )
 
-fun IncidentDetails.toIncident(community: Community? = null, user: User? = null): Incident {
+fun IncidentDetails.toIncident(
+    community: Community? = null,
+    user: User? = null,
+    specificLatitude: Long? = null,
+    specificLongitude: Long? = null,
+): Incident {
     return Incident(
         id = id,
         communityId = 1,
@@ -104,8 +117,8 @@ fun IncidentDetails.toIncident(community: Community? = null, user: User? = null)
 //        },
         title = title,
         description = description,
-        latitude = null,
-        longitude = null,
+        latitude = specificLatitude ?: latitude,
+        longitude = specificLongitude ?: longitude,
         createdAt = Date(),
         updatedAt = Date()
     )
@@ -124,6 +137,8 @@ fun Incident.toIncidentDetails(): IncidentDetails {
         communityId = communityId,
         userId = userId,
         title = title,
-        description = description
+        description = description,
+        latitude = latitude,
+        longitude = longitude
     )
 }

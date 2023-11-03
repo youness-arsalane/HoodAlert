@@ -1,5 +1,6 @@
 package com.example.hoodalert.ui.screens.incidents
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -177,6 +178,7 @@ fun Details(
 //            )
 //        }
 //    }
+
     Card(
         modifier = modifier, colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
