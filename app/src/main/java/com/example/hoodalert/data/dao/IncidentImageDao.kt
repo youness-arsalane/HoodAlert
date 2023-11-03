@@ -16,6 +16,9 @@ interface IncidentImageDao {
     @Query("SELECT * FROM incident_images")
     fun getAllIncidentImages(): Flow<List<IncidentImage>>
 
+    @Query("SELECT * FROM incident_images WHERE incident_id = :incidentId")
+    fun findByIncidentId(incidentId: Int): Flow<List<IncidentImage>>
+
     @Query("SELECT * FROM incident_images WHERE id = :id")
     fun getIncidentImage(id: Int): Flow<IncidentImage>
 

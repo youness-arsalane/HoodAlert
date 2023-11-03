@@ -25,6 +25,9 @@ data class IncidentImage(
     @ColumnInfo(name = "incident_id")
     val incidentId: Int,
 
+    @ColumnInfo(name = "path")
+    val path: String,
+
     @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
     val createdAt: Date,
 

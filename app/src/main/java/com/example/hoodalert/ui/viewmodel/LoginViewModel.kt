@@ -1,12 +1,12 @@
 package com.example.hoodalert.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.example.hoodalert.data.AppContainer
+import com.example.hoodalert.data.AppDataContainer
 import com.example.hoodalert.data.model.User
 import com.example.hoodalert.data.model.UserSession
 import java.util.Date
 
-class LoginViewModel(private val appContainer: AppContainer) : ViewModel() {
+class LoginViewModel(private val appContainer: AppDataContainer) : ViewModel() {
     suspend fun login(
         email: String,
         password: String,

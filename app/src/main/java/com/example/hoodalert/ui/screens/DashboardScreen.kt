@@ -32,7 +32,6 @@ import com.example.hoodalert.data.model.User
 import com.example.hoodalert.ui.components.HoodAlertTopAppBar
 import com.example.hoodalert.ui.navigation.NavigationDestination
 import com.example.hoodalert.ui.screens.communities.CommunityListDestination
-import com.example.hoodalert.ui.screens.incidents.IncidentListDestination
 import com.example.hoodalert.ui.theme.HoodAlertTheme
 import com.example.hoodalert.util.supportWideScreen
 import java.util.Date

@@ -1,12 +1,15 @@
 package com.example.hoodalert.ui.screens.incidents
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -23,25 +26,32 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.hoodalert.R
 import com.example.hoodalert.data.model.Incident
+import com.example.hoodalert.data.model.IncidentImage
 import com.example.hoodalert.ui.AppViewModelProvider
 import com.example.hoodalert.ui.components.HoodAlertTopAppBar
 import com.example.hoodalert.ui.navigation.NavigationDestination
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentDetailsUiState
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentDetailsViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.getFullName
+import com.example.hoodalert.ui.viewmodel.incidents.getIncidentImages
 import com.example.hoodalert.ui.viewmodel.incidents.toIncident
 import kotlinx.coroutines.launch
 
@@ -62,6 +72,13 @@ fun DetailsScreen(
 ) {
     val uiState = viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+
+    val incident = uiState.value.incidentDetails.toIncident()
+
+    var incidentImageList by remember { mutableStateOf(emptyList<IncidentImage>()) }
+    LaunchedEffect(incident) {
+        incidentImageList = incident.getIncidentImages(viewModel)
+    }
 
     Scaffold(
         topBar = {
@@ -85,6 +102,7 @@ fun DetailsScreen(
         }, modifier = modifier
     ) { innerPadding ->
         DetailsBody(
+            incidentImageList = incidentImageList,
             incidentDetailsUiState = uiState.value,
             onDelete = {
                 coroutineScope.launch {
@@ -101,16 +119,19 @@ fun DetailsScreen(
 
 @Composable
 private fun DetailsBody(
+    incidentImageList: List<IncidentImage>,
     incidentDetailsUiState: IncidentDetailsUiState,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+
     Column(
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
         Details(
+            incidentImageList = incidentImageList,
             incidentDetailsUiState = incidentDetailsUiState,
             incident = incidentDetailsUiState.incidentDetails.toIncident(),
             modifier = Modifier.fillMaxWidth()
@@ -138,10 +159,24 @@ private fun DetailsBody(
 
 @Composable
 fun Details(
+    incidentImageList: List<IncidentImage>,
     incidentDetailsUiState: IncidentDetailsUiState,
     incident: Incident,
     modifier: Modifier = Modifier
 ) {
+//    LazyColumn(modifier = modifier) {
+//        items(items = incidentImageList, key = { it.id }) { incidentImage ->
+//            Image(
+//                painter = rememberAsyncImagePainter(
+//                    ImageRequest.Builder(LocalContext.current).data(data = incidentImage.path)
+//                        .apply(block = fun ImageRequest.Builder.() {
+//
+//                        }).build()
+//                ),
+//                contentDescription = null
+//            )
+//        }
+//    }
     Card(
         modifier = modifier, colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -178,6 +213,22 @@ fun Details(
             DetailsRow(
                 labelResID = R.string.description,
                 incidentDetail = incident.description,
+                modifier = Modifier.padding(
+                    horizontal = 16.dp
+                )
+            )
+            DetailsRow(
+                labelResID = R.string.latitude,
+                incidentDetail = if (incident.latitude != null) "%.6f".format(incident.latitude!! / 1_000_000.0)
+                else "Niet bekend",
+                modifier = Modifier.padding(
+                    horizontal = 16.dp
+                )
+            )
+            DetailsRow(
+                labelResID = R.string.longitude,
+                incidentDetail = if (incident.longitude != null) "%.6f".format(incident.longitude!! / 1_000_000.0)
+                else "Niet bekend",
                 modifier = Modifier.padding(
                     horizontal = 16.dp
                 )

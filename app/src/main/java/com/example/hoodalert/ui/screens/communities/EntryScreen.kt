@@ -53,7 +53,7 @@ fun EntryScreen(
     ) { innerPadding ->
         EntryBody(
             communityUiState = viewModel.communityUiState,
-            onCommunityValueChange = viewModel::updateUiState,
+            onCommunityValueChange = { viewModel.updateUiState(it) },
             onSaveClick = {
                 coroutineScope.launch {
                     viewModel.saveCommunity()

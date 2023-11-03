@@ -1,12 +1,13 @@
 package com.example.hoodalert.ui.viewmodel.incidents
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.hoodalert.data.AppContainer
+import com.example.hoodalert.data.AppDataContainer
 import com.example.hoodalert.data.model.Community
 import com.example.hoodalert.data.model.Incident
 import com.example.hoodalert.data.model.User
@@ -14,11 +15,12 @@ import com.example.hoodalert.ui.screens.communities.CommunityEditDestination
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.Date
 
 class IncidentEntryViewModel(
     savedStateHandle: SavedStateHandle,
-    private val appContainer: AppContainer
+    private val appContainer: AppDataContainer
 ) : ViewModel() {
     var incidentUiState by mutableStateOf(IncidentUiState())
         private set
@@ -46,7 +48,24 @@ class IncidentEntryViewModel(
 
     suspend fun saveIncident() {
         if (validateInput()) {
-            appContainer.incidentsRepository.insertIncident(incidentUiState.incidentDetails.toIncident())
+            val incident = incidentUiState.incidentDetails.toIncident()
+
+            if (incident.id == 0) {
+                appContainer.getCurrentLocation { location ->
+                    Log.d("HOOD_ALERT_DEBUG", "Location:")
+                    Log.d("HOOD_ALERT_DEBUG", location.toString())
+                    if (location != null) {
+                        incident.latitude = location.first.toLong()
+                        incident.longitude = location.second.toLong()
+                    }
+
+                    runBlocking {
+                        appContainer.incidentsRepository.insertIncident(incident)
+                    }
+                }
+            } else {
+                appContainer.incidentsRepository.insertIncident(incident)
+            }
         }
     }
 
@@ -67,29 +86,44 @@ data class IncidentUiState(
 data class IncidentDetails(
     val id: Int = 0,
     val communityId: Int = 0,
+    val userId: Int = 0,
     val title: String = "",
     val description: String = ""
 )
 
-fun IncidentDetails.toIncident(): Incident = Incident(
-    id = id,
-    communityId = 1,
-    userId = 1,
-    title = title,
-    description = description,
-    latitude = null,
-    longitude = null,
-    createdAt = Date(),
-    updatedAt = Date()
-)
+fun IncidentDetails.toIncident(community: Community? = null, user: User? = null): Incident {
+    return Incident(
+        id = id,
+        communityId = 1,
+        userId = 1,
+//        communityId = if (communityId == 0 && community != null) community.id else {
+//            communityId
+//        },
+//        userId = if (userId == 0 && user != null) user.id else {
+//            userId
+//        },
+        title = title,
+        description = description,
+        latitude = null,
+        longitude = null,
+        createdAt = Date(),
+        updatedAt = Date()
+    )
+}
 
-fun Incident.toIncidentUiState(isEntryValid: Boolean = false): IncidentUiState = IncidentUiState(
-    incidentDetails = this.toIncidentDetails(),
-    isEntryValid = isEntryValid
-)
+fun Incident.toIncidentUiState(isEntryValid: Boolean = false): IncidentUiState {
+    return IncidentUiState(
+        incidentDetails = this.toIncidentDetails(),
+        isEntryValid = isEntryValid
+    )
+}
 
-fun Incident.toIncidentDetails(): IncidentDetails = IncidentDetails(
-    id = id,
-    title = title,
-    description = description
-)
+fun Incident.toIncidentDetails(): IncidentDetails {
+    return IncidentDetails(
+        id = id,
+        communityId = communityId,
+        userId = userId,
+        title = title,
+        description = description
+    )
+}

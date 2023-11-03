@@ -24,8 +24,10 @@ import com.example.hoodalert.ui.AppViewModelProvider
 import com.example.hoodalert.ui.components.HoodAlertTopAppBar
 import com.example.hoodalert.ui.navigation.NavigationDestination
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentDetails
+import com.example.hoodalert.ui.viewmodel.incidents.IncidentEditViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentEntryViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentUiState
+import com.example.hoodalert.ui.viewmodel.incidents.toIncident
 import kotlinx.coroutines.launch
 
 object IncidentEntryDestination : NavigationDestination {
@@ -55,7 +57,7 @@ fun EntryScreen(
     ) { innerPadding ->
         EntryBody(
             incidentUiState = viewModel.incidentUiState,
-            onIncidentValueChange = viewModel::updateUiState,
+            onIncidentValueChange = { viewModel.updateUiState(it) },
             onSaveClick = {
                 coroutineScope.launch {
                     viewModel.saveIncident()
@@ -72,9 +74,11 @@ fun EntryScreen(
 
 @Composable
 fun EntryBody(
+    viewModel: IncidentEditViewModel? = null,
     incidentUiState: IncidentUiState,
     onIncidentValueChange: (IncidentDetails) -> Unit,
     onSaveClick: () -> Unit,
+    onImageAdded: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -83,11 +87,23 @@ fun EntryBody(
     ) {
         Text(text = "Community: " + incidentUiState.community?.name.toString())
 
+        if (incidentUiState.incidentDetails.id != 0 && viewModel != null) {
+            ImageSelectionScreen(
+                incident = incidentUiState.incidentDetails.toIncident(
+                    incidentUiState.community,
+                    incidentUiState.user
+                ),
+                viewModel = viewModel,
+                onImageAdded = onImageAdded
+            )
+        }
+
         InputForm(
             incidentDetails = incidentUiState.incidentDetails,
             onValueChange = onIncidentValueChange,
             modifier = Modifier.fillMaxWidth()
         )
+
         Button(
             onClick = onSaveClick,
             enabled = incidentUiState.isEntryValid,

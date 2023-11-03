@@ -8,11 +8,13 @@ import androidx.room.TypeConverters
 import com.example.hoodalert.data.dao.CommunityDao
 import com.example.hoodalert.data.dao.CommunityUserDao
 import com.example.hoodalert.data.dao.IncidentDao
+import com.example.hoodalert.data.dao.IncidentImageDao
 import com.example.hoodalert.data.dao.UserDao
 import com.example.hoodalert.data.dao.UserSessionDao
 import com.example.hoodalert.data.model.Community
 import com.example.hoodalert.data.model.CommunityUser
 import com.example.hoodalert.data.model.Incident
+import com.example.hoodalert.data.model.IncidentImage
 import com.example.hoodalert.data.model.User
 import com.example.hoodalert.data.model.UserSession
 import com.example.hoodalert.util.Converters
@@ -22,16 +24,18 @@ import com.example.hoodalert.util.Converters
         Community::class,
         CommunityUser::class,
         Incident::class,
+        IncidentImage::class,
         User::class,
         UserSession::class,
     ],
-    version = 11
+    version = 14
 )
 @TypeConverters(Converters::class)
 abstract class HoodAlertDatabase : RoomDatabase() {
     abstract fun communityDao(): CommunityDao
     abstract fun communityUserDao(): CommunityUserDao
     abstract fun incidentDao(): IncidentDao
+    abstract fun incidentImageDao(): IncidentImageDao
     abstract fun userDao(): UserDao
     abstract fun userSessionDao(): UserSessionDao
 

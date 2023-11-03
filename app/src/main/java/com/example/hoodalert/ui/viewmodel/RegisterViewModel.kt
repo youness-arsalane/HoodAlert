@@ -5,11 +5,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.example.hoodalert.data.AppContainer
+import com.example.hoodalert.data.AppDataContainer
 import com.example.hoodalert.data.model.User
 import java.util.Date
 
-class RegisterViewModel(private val appContainer: AppContainer) : ViewModel() {
+class RegisterViewModel(private val appContainer: AppDataContainer) : ViewModel() {
     var userUiState by mutableStateOf(UserUiState())
         private set
 

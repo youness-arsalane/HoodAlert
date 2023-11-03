@@ -5,13 +5,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.example.hoodalert.data.AppContainer
+import com.example.hoodalert.data.AppDataContainer
 import com.example.hoodalert.data.model.Community
 import com.example.hoodalert.data.model.CommunityUser
 import java.util.Date
 
 class CommunityEntryViewModel(
-    private val appContainer: AppContainer
+    private val appContainer: AppDataContainer
 ) : ViewModel() {
     var communityUiState by mutableStateOf(CommunityUiState())
         private set

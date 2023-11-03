@@ -62,7 +62,7 @@ fun RegisterScreen(
     ) { innerPadding ->
         RegisterBody(
             userUiState = viewModel.userUiState,
-            onUserValueChange = viewModel::updateUiState,
+            onUserValueChange = { viewModel.updateUiState(it) },
             onSaveClick = {
                 coroutineScope.launch {
                     viewModel.saveUser()

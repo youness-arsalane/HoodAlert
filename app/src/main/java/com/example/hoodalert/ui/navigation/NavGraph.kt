@@ -1,6 +1,5 @@
 package com.example.hoodalert.ui.navigation
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewModelScope
@@ -103,7 +102,7 @@ fun HoodAlertNavHost(
                 type = NavType.IntType
             })
         ) {
-            val communityId = it.arguments?.getInt(CommunityDetailsDestination.communityIdArg) ?: 0;
+            val communityId = it.arguments?.getInt(CommunityDetailsDestination.communityIdArg) ?: 0
 
             CommunityDetailsScreen(
                 navigateToEditCommunity = { navController.navigate("${CommunityEditDestination.route}/$it") },

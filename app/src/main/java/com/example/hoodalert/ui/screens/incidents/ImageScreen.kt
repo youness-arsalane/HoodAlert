@@ -3,27 +3,22 @@
 //import android.content.ContentResolver
 //import android.content.ContentUris
 //import android.content.Context
+//import android.content.Intent
 //import android.database.Cursor
 //import android.net.Uri
-//import android.os.Bundle
 //import android.provider.MediaStore
-//import androidx.activity.ComponentActivity
-//import androidx.activity.compose.setContent
+//import androidx.compose.foundation.clickable
 //import androidx.compose.foundation.layout.Column
 //import androidx.compose.foundation.layout.fillMaxSize
+//import androidx.compose.material.icons.Icons
+//import androidx.compose.material.icons.filled.Add
+//import androidx.compose.material.icons.filled.Image
 //import androidx.compose.material3.Icon
-//import androidx.compose.material3.icons.Icons
-//import androidx.compose.material3.icons.filled.Add
-//import androidx.compose.material3.icons.filled.Image
-//import androidx.compose.material3.icons.filled.Save
-//import androidx.compose.material3.ripple.rememberRipple
 //import androidx.compose.runtime.*
 //import androidx.compose.ui.Modifier
 //import androidx.compose.ui.platform.LocalContext
-//import androidx.core.net.toUri
 //import androidx.lifecycle.viewmodel.compose.viewModel
 //import com.example.hoodalert.ImageEntity
-//import com.example.hoodalert.data.HoodAlertDatabase
 //import kotlinx.coroutines.launch
 //
 //@Composable

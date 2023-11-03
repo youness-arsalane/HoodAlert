@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.hoodalert.data.AppContainer
+import com.example.hoodalert.data.AppDataContainer
 import com.example.hoodalert.ui.screens.communities.CommunityEditDestination
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 class CommunityEditViewModel(
     savedStateHandle: SavedStateHandle,
-    private val appContainer: AppContainer
+    private val appContainer: AppDataContainer
 ) : ViewModel() {
     var communityUiState by mutableStateOf(CommunityUiState())
         private set

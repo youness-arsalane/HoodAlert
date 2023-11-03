@@ -3,7 +3,7 @@ package com.example.hoodalert.ui.viewmodel.communities
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.hoodalert.data.AppContainer
+import com.example.hoodalert.data.AppDataContainer
 import com.example.hoodalert.data.model.Community
 import com.example.hoodalert.data.model.User
 import kotlinx.coroutines.flow.SharingStarted
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
-class CommunityListViewModel(private val appContainer: AppContainer) : ViewModel() {
+class CommunityListViewModel(private val appContainer: AppDataContainer) : ViewModel() {
     val communityListUiState: StateFlow<CommunityListUiState> =
         appContainer.communitiesRepository.getAllCommunitiesStream()
             .map { CommunityListUiState(it) }

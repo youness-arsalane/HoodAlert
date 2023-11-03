@@ -3,7 +3,7 @@ package com.example.hoodalert.ui.viewmodel.communities
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.hoodalert.data.AppContainer
+import com.example.hoodalert.data.AppDataContainer
 import com.example.hoodalert.data.model.Community
 import com.example.hoodalert.data.model.CommunityUser
 import com.example.hoodalert.data.model.Incident
@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.stateIn
 
 class CommunityDetailsViewModel(
     savedStateHandle: SavedStateHandle,
-    private val appContainer: AppContainer
+    private val appContainer: AppDataContainer
 ) : ViewModel() {
 
     private val communityId: Int =
