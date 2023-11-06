@@ -28,7 +28,7 @@ import com.example.hoodalert.util.Converters
         User::class,
         UserSession::class,
     ],
-    version = 14
+    version = 16
 )
 @TypeConverters(Converters::class)
 abstract class HoodAlertDatabase : RoomDatabase() {

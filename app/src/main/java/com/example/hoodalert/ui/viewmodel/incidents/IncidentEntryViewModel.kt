@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.text.DecimalFormat
 import java.util.Date
 
 class IncidentEntryViewModel(
@@ -57,12 +58,9 @@ class IncidentEntryViewModel(
 
                     if (location != null) {
                         incident = incidentUiState.incidentDetails.toIncident(
-                            specificLatitude = location.first.toLong(),
-                            specificLongitude = location.second.toLong()
+                            specificLatitude = location.first,
+                            specificLongitude = location.second
                         )
-                        Log.d("HOOD_ALERT_DEBUG", "Location:")
-                        Log.d("HOOD_ALERT_DEBUG", incident.latitude.toString())
-                        Log.d("HOOD_ALERT_DEBUG", incident.longitude.toString())
                     }
 
                     runBlocking {
@@ -95,15 +93,15 @@ data class IncidentDetails(
     val userId: Int = 0,
     val title: String = "",
     val description: String = "",
-    val latitude: Long? = null,
-    val longitude: Long? = null,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
 )
 
 fun IncidentDetails.toIncident(
     community: Community? = null,
     user: User? = null,
-    specificLatitude: Long? = null,
-    specificLongitude: Long? = null,
+    specificLatitude: Double? = null,
+    specificLongitude: Double? = null,
 ): Incident {
     return Incident(
         id = id,

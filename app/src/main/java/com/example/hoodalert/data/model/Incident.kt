@@ -42,10 +42,10 @@ data class Incident(
     val description: String,
 
     @ColumnInfo(name = "latitude")
-    val latitude: Long?,
+    val latitude: Double?,
 
     @ColumnInfo(name = "longitude")
-    val longitude: Long?,
+    val longitude: Double?,
 
     @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
     val createdAt: Date,

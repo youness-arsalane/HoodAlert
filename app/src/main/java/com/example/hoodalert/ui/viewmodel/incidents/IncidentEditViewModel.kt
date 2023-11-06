@@ -1,6 +1,7 @@
 package com.example.hoodalert.ui.viewmodel.incidents
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -55,10 +56,13 @@ class IncidentEditViewModel(
     }
 
     suspend fun addIncidentImage(incident: Incident, uri: Uri) {
+        Log.d("HOOD_ALERT_DEBUG", "addIncidentImage")
+        Log.d("HOOD_ALERT_DEBUG", uri.toString())
+
         val incidentImage = IncidentImage(
             id = 0,
             incidentId = incident.id,
-            path = uri.path.toString(),
+            path = uri.toString(),
             createdAt = Date(),
             updatedAt = Date()
         )

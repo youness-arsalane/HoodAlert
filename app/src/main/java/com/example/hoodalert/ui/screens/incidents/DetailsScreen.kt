@@ -1,15 +1,24 @@
 package com.example.hoodalert.ui.screens.incidents
 
+import android.content.ContentResolver
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -36,10 +45,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -55,6 +69,7 @@ import com.example.hoodalert.ui.viewmodel.incidents.getFullName
 import com.example.hoodalert.ui.viewmodel.incidents.getIncidentImages
 import com.example.hoodalert.ui.viewmodel.incidents.toIncident
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 object IncidentDetailsDestination : NavigationDestination {
     override val route = "incident_details"
@@ -165,19 +180,7 @@ fun Details(
     incident: Incident,
     modifier: Modifier = Modifier
 ) {
-//    LazyColumn(modifier = modifier) {
-//        items(items = incidentImageList, key = { it.id }) { incidentImage ->
-//            Image(
-//                painter = rememberAsyncImagePainter(
-//                    ImageRequest.Builder(LocalContext.current).data(data = incidentImage.path)
-//                        .apply(block = fun ImageRequest.Builder.() {
-//
-//                        }).build()
-//                ),
-//                contentDescription = null
-//            )
-//        }
-//    }
+    ImageSlider(incidentImageList)
 
     Card(
         modifier = modifier, colors = CardDefaults.cardColors(
@@ -221,7 +224,7 @@ fun Details(
             )
             DetailsRow(
                 labelResID = R.string.latitude,
-                incidentDetail = if (incident.latitude != null) "%.6f".format(incident.latitude!! / 1_000_000.0)
+                incidentDetail = if (incident.latitude != null) "%.6f".format(incident.latitude!! / 1.0)
                 else "Niet bekend",
                 modifier = Modifier.padding(
                     horizontal = 16.dp
@@ -229,7 +232,7 @@ fun Details(
             )
             DetailsRow(
                 labelResID = R.string.longitude,
-                incidentDetail = if (incident.longitude != null) "%.6f".format(incident.longitude!! / 1_000_000.0)
+                incidentDetail = if (incident.longitude != null) "%.6f".format(incident.longitude!! / 1.0)
                 else "Niet bekend",
                 modifier = Modifier.padding(
                     horizontal = 16.dp
@@ -237,6 +240,53 @@ fun Details(
             )
         }
 
+    }
+}
+
+@Composable
+fun ImageSlider(incidentImageList: List<IncidentImage>)
+{
+    val context = LocalContext.current
+    val density = LocalDensity.current.density
+
+    Log.d("HOOD_ALERT_DEBUG", "ImageCount: " + incidentImageList.count().toString())
+
+    LazyRow(
+        modifier = Modifier
+            .fillMaxSize()
+            .height(100.dp)
+            .background(Color.Gray)
+    ) {
+        items(items = incidentImageList, key = { it.id }) { incidentImage ->
+            Log.d("HOOD_ALERT_DEBUG", "path: " + incidentImage.path)
+            Log.d("HOOD_ALERT_DEBUG", "uri: " + incidentImage.path.toUri().toString())
+            val bitmap = loadBitmap(context.contentResolver, incidentImage.path.toUri())
+            if (bitmap != null) {
+                Log.d("HOOD_ALERT_DEBUG", "bitmap not empty")
+
+                Image(
+                    bitmap = bitmap.asImageBitmap(),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .width((100 * density).dp)
+                        .height((100 * density).dp)
+                )
+            } else {
+                Log.d("HOOD_ALERT_DEBUG", "bitmap empty")
+            }
+        }
+    }
+}
+
+@Composable
+fun loadBitmap(contentResolver: ContentResolver, uri: Uri): Bitmap? {
+    return try {
+        val inputStream = contentResolver.openInputStream(uri)
+        BitmapFactory.decodeStream(inputStream)
+    } catch (e: IOException) {
+        null
     }
 }
 
