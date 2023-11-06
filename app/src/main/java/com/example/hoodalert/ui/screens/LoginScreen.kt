@@ -53,6 +53,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.hoodalert.R
 import com.example.hoodalert.data.auth.SharedPreferencesManager
+import com.example.hoodalert.data.model.User
 import com.example.hoodalert.ui.AppViewModelProvider
 import com.example.hoodalert.ui.components.EmailState
 import com.example.hoodalert.ui.components.EmailStateSaver
@@ -73,7 +74,7 @@ object LoginDestination : NavigationDestination {
 fun LoginScreen(
     viewModel: LoginViewModel = viewModel(factory = AppViewModelProvider.Factory),
     navController: NavController,
-    onLoginSuccess: () -> Unit,
+    onLoginSuccess: (user: User) -> Unit,
     onRegister: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -115,7 +116,7 @@ fun LoginScreen(
                                                         token = token
                                                     )
 
-                                                    onLoginSuccess()
+                                                    onLoginSuccess(user)
                                                 }
                                             },
                                             onLoginFailed = {

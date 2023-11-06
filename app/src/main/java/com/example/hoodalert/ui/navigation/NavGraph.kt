@@ -1,6 +1,10 @@
 package com.example.hoodalert.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -42,13 +46,13 @@ fun HoodAlertNavHost(
     modifier: Modifier = Modifier,
 ) {
     val loginViewModel: LoginViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    var loggedInUser: User? by rememberSaveable { mutableStateOf(null) }
 
     NavHost(
         navController = navController,
         startDestination = LoginDestination.route,
         modifier = modifier
     ) {
-        var loggedInUser: User? = null
         loginViewModel.viewModelScope.launch {
             try {
                 loggedInUser = loginViewModel.getLoggedInUser()
@@ -60,7 +64,10 @@ fun HoodAlertNavHost(
         composable(route = LoginDestination.route) {
             LoginScreen(
                 navController = navController,
-                onLoginSuccess = { navController.navigate(DashboardDestination.route) },
+                onLoginSuccess = { user ->
+                    loggedInUser = user
+                    navController.navigate(DashboardDestination.route)
+                },
                 onRegister = { navController.navigate(RegisterDestination.route) }
             )
         }
@@ -75,6 +82,7 @@ fun HoodAlertNavHost(
                 navController = navController,
                 loggedInUser = loggedInUser,
                 onLogout = {
+                    loggedInUser = null
                     loginViewModel.logout()
                     navController.navigate(LoginDestination.route)
                 },
