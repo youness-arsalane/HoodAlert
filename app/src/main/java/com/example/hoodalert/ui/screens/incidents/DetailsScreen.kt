@@ -4,7 +4,6 @@ import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -55,8 +53,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.example.hoodalert.R
 import com.example.hoodalert.data.model.Incident
 import com.example.hoodalert.data.model.IncidentImage
@@ -67,7 +63,6 @@ import com.example.hoodalert.ui.viewmodel.incidents.IncidentDetailsUiState
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentDetailsViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.getFullName
 import com.example.hoodalert.ui.viewmodel.incidents.getIncidentImages
-import com.example.hoodalert.ui.viewmodel.incidents.toIncident
 import kotlinx.coroutines.launch
 import java.io.IOException
 
@@ -89,7 +84,7 @@ fun DetailsScreen(
     val uiState = viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
-    val incident = uiState.value.incidentDetails.toIncident()
+    val incident = uiState.value.incident
 
     var incidentImageList by remember { mutableStateOf(emptyList<IncidentImage>()) }
     LaunchedEffect(incident) {
@@ -105,7 +100,7 @@ fun DetailsScreen(
             )
         }, floatingActionButton = {
             FloatingActionButton(
-                onClick = { navigateToEditIncident(uiState.value.incidentDetails.id) },
+                onClick = { navigateToEditIncident(uiState.value.incident.id) },
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.padding(20.dp)
 
@@ -149,7 +144,7 @@ private fun DetailsBody(
         Details(
             incidentImageList = incidentImageList,
             incidentDetailsUiState = incidentDetailsUiState,
-            incident = incidentDetailsUiState.incidentDetails.toIncident(),
+            incident = incidentDetailsUiState.incident,
             modifier = Modifier.fillMaxWidth()
         )
         OutlinedButton(
@@ -244,12 +239,9 @@ fun Details(
 }
 
 @Composable
-fun ImageSlider(incidentImageList: List<IncidentImage>)
-{
+fun ImageSlider(incidentImageList: List<IncidentImage>) {
     val context = LocalContext.current
     val density = LocalDensity.current.density
-
-    Log.d("HOOD_ALERT_DEBUG", "ImageCount: " + incidentImageList.count().toString())
 
     LazyRow(
         modifier = Modifier
@@ -258,12 +250,8 @@ fun ImageSlider(incidentImageList: List<IncidentImage>)
             .background(Color.Gray)
     ) {
         items(items = incidentImageList, key = { it.id }) { incidentImage ->
-            Log.d("HOOD_ALERT_DEBUG", "path: " + incidentImage.path)
-            Log.d("HOOD_ALERT_DEBUG", "uri: " + incidentImage.path.toUri().toString())
             val bitmap = loadBitmap(context.contentResolver, incidentImage.path.toUri())
             if (bitmap != null) {
-                Log.d("HOOD_ALERT_DEBUG", "bitmap not empty")
-
                 Image(
                     bitmap = bitmap.asImageBitmap(),
                     contentDescription = null,
@@ -273,8 +261,6 @@ fun ImageSlider(incidentImageList: List<IncidentImage>)
                         .width((100 * density).dp)
                         .height((100 * density).dp)
                 )
-            } else {
-                Log.d("HOOD_ALERT_DEBUG", "bitmap empty")
             }
         }
     }

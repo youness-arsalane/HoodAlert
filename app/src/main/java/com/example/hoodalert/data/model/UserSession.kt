@@ -20,17 +20,17 @@ import java.util.Date
 )
 data class UserSession(
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    var id: Int,
 
     @ColumnInfo(name = "user_id")
-    val userId: Int,
+    var userId: Int,
 
     @ColumnInfo(name = "token")
-    val token: String,
+    var token: String,
 
     @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
-    val createdAt: Date,
+    var createdAt: Date,
 
     @ColumnInfo(name = "updated_at", defaultValue = "CURRENT_TIMESTAMP")
-    val updatedAt: Date
+    var updatedAt: Date
 )

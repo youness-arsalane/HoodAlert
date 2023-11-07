@@ -50,18 +50,18 @@ class IncidentEditViewModel(
     }
 
     suspend fun updateIncident() {
-        if (validateInput(incidentUiState.incidentDetails)) {
-            appContainer.incidentsRepository.updateIncident(incidentUiState.incidentDetails.toIncident())
+        if (validateInput(incidentUiState.incident)) {
+            appContainer.incidentsRepository.updateIncident(incidentUiState.incident)
         }
     }
 
-    suspend fun addIncidentImage(incident: Incident, uri: Uri) {
-        Log.d("HOOD_ALERT_DEBUG", "addIncidentImage")
-        Log.d("HOOD_ALERT_DEBUG", uri.toString())
-
+    suspend fun addIncidentImage(uri: Uri) {
+        Log.d("HOOD_ALERT_DEBUG", "VM => addIncidentImage")
+        Log.d("HOOD_ALERT_DEBUG", "VM => uri (${uri})")
+        Log.d("HOOD_ALERT_DEBUG", "VM => incident + ${incidentUiState.incident.id}")
         val incidentImage = IncidentImage(
             id = 0,
-            incidentId = incident.id,
+            incidentId = incidentUiState.incident.id,
             path = uri.toString(),
             createdAt = Date(),
             updatedAt = Date()
@@ -70,15 +70,15 @@ class IncidentEditViewModel(
         appContainer.incidentImagesRepository.insertIncidentImage(incidentImage)
     }
 
-    fun updateUiState(incidentDetails: IncidentDetails) {
+    fun updateUiState(incident: Incident) {
         incidentUiState =
             IncidentUiState(
-                incidentDetails = incidentDetails,
-                isEntryValid = validateInput(incidentDetails)
+                incident = incident,
+                isEntryValid = validateInput(incident)
             )
     }
 
-    private fun validateInput(uiState: IncidentDetails = incidentUiState.incidentDetails): Boolean {
+    private fun validateInput(uiState: Incident = incidentUiState.incident): Boolean {
         return with(uiState) {
             title.isNotBlank() && description.isNotBlank()
         }

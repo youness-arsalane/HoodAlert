@@ -91,7 +91,9 @@ fun HoodAlertNavHost(
         composable(route = CommunityListDestination.route) {
             CommunityListScreen(
                 loggedInUser = loggedInUser,
-                navigateToCommunityEntry = { navController.navigate(CommunityEntryDestination.route) },
+                navigateToCommunityEntry = {
+                    navController.navigate(CommunityEntryDestination.route)
+                },
                 navigateToCommunityUpdate = {
                     navController.navigate("${CommunityDetailsDestination.route}/${it}")
                 },
@@ -148,7 +150,8 @@ fun HoodAlertNavHost(
         ) {
             IncidentEntryScreen(
                 navigateBack = { navController.popBackStack() },
-                onNavigateUp = { navController.navigateUp() }
+                onNavigateUp = { navController.navigateUp() },
+                loggedInUser = loggedInUser,
             )
         }
         composable(

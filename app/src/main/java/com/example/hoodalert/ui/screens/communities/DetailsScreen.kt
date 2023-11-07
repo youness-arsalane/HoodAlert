@@ -77,6 +77,10 @@ fun DetailsScreen(
     modifier: Modifier = Modifier,
     viewModel: CommunityDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    if (loggedInUser === null) {
+        return
+    }
+
     val uiState = viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     var communityUser by remember { mutableStateOf<CommunityUser?>(null) }
@@ -143,8 +147,8 @@ fun DetailsScreen(
                 val newCommunityUser = CommunityUser(
                     id = 0,
                     communityId = uiState.value.communityDetails.toCommunity().id,
-                    userId = loggedInUser!!.id,
-                    isAdmin = true,
+                    userId = loggedInUser.id,
+                    isAdmin = false,
                     createdAt = Date(),
                     updatedAt = Date()
                 )

@@ -1,6 +1,5 @@
 package com.example.hoodalert.ui.viewmodel.communities
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hoodalert.data.AppDataContainer
@@ -27,9 +26,6 @@ class CommunityListViewModel(private val appContainer: AppDataContainer) : ViewM
     }
 
     suspend fun isMemberOfCommunity(user: User, community: Community): Boolean {
-        Log.d("HOOD_ALERT_DEBUG", "VM => User ID: " + user.id.toString())
-        Log.d("HOOD_ALERT_DEBUG", "VM => Community ID: " + community.id.toString())
-
         return appContainer.communityUsersRepository.findByCommunityAndUser(community, user)
             .count() == 0
     }

@@ -48,6 +48,10 @@ fun DashboardScreen(
     loggedInUser: User?,
     onLogout: () -> Unit
 ) {
+    if (loggedInUser == null) {
+        return
+    }
+
     Scaffold(
         topBar = {
             HoodAlertTopAppBar(
@@ -77,7 +81,7 @@ fun DashboardScreen(
                         verticalArrangement = Arrangement.Center,
                     ) {
                         Text(
-                            text = "Welcome, " + loggedInUser?.firstName + "!",
+                            text = "Welcome, " + loggedInUser.firstName + "!",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(8.dp)

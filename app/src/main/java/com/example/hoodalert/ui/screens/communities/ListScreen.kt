@@ -1,7 +1,6 @@
 package com.example.hoodalert.ui.screens.communities
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -65,6 +64,10 @@ fun ListScreen(
     modifier: Modifier = Modifier,
     viewModel: CommunityListViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    if (loggedInUser == null) {
+        return
+    }
+
     val communityListUiState by viewModel.communityListUiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -105,7 +108,7 @@ fun ListScreen(
 
 @Composable
 private fun ListBody(
-    loggedInUser: User?,
+    loggedInUser: User,
     viewModel: CommunityListViewModel,
     communityList: List<Community>,
     onCommunityClick: (Int) -> Unit,
@@ -135,7 +138,7 @@ private fun ListBody(
 
 @Composable
 private fun HoodAlertList(
-    loggedInUser: User?,
+    loggedInUser: User,
     viewModel: CommunityListViewModel,
     communityList: List<Community>,
     onCommunityClick: (Community) -> Unit,
@@ -146,13 +149,8 @@ private fun HoodAlertList(
 
             var isMember by remember { mutableStateOf(false) }
             LaunchedEffect(loggedInUser) {
-                Log.d("HOOD_ALERT_DEBUG", "LaunchedEffect")
-                Log.d("HOOD_ALERT_DEBUG", "User ID: " + loggedInUser?.id.toString())
-
                 withContext(Dispatchers.IO) {
-                    Log.d("HOOD_ALERT_DEBUG", "withContext")
-                    isMember = loggedInUser != null && community.isMember(viewModel, loggedInUser)
-                    Log.d("HOOD_ALERT_DEBUG", "isMember: $isMember")
+                    isMember = community.isMember(viewModel, loggedInUser)
                 }
             }
 

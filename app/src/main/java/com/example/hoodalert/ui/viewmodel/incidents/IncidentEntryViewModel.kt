@@ -1,6 +1,5 @@
 package com.example.hoodalert.ui.viewmodel.incidents
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -16,7 +15,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.text.DecimalFormat
 import java.util.Date
 
 class IncidentEntryViewModel(
@@ -40,40 +38,40 @@ class IncidentEntryViewModel(
         }
     }
 
-    fun updateUiState(incidentDetails: IncidentDetails) {
+    fun updateUiState(incident: Incident) {
         incidentUiState = IncidentUiState(
-            incidentDetails = incidentDetails,
-            isEntryValid = validateInput(incidentDetails)
+            incident = incident,
+            isEntryValid = validateInput(incident),
+            community = incidentUiState.community
         )
     }
 
     suspend fun saveIncident() {
-        if (validateInput()) {
-            var incident = incidentUiState.incidentDetails.toIncident()
+        if (!validateInput()) {
+            return
+        }
 
-            if (incident.id == 0) {
-                appContainer.getCurrentLocation { location ->
-                    Log.d("HOOD_ALERT_DEBUG", "Location:")
-                    Log.d("HOOD_ALERT_DEBUG", location.toString())
+        val incident = incidentUiState.incident
+        if (incident.id != 0) {
+            appContainer.incidentsRepository.insertIncident(incident)
+            return
+        }
 
-                    if (location != null) {
-                        incident = incidentUiState.incidentDetails.toIncident(
-                            specificLatitude = location.first,
-                            specificLongitude = location.second
-                        )
-                    }
+        appContainer.getCurrentLocation { location ->
+            if (location != null) {
+                incident.latitude = location.first
+                incident.longitude = location.second
+            }
 
-                    runBlocking {
-                        appContainer.incidentsRepository.insertIncident(incident)
-                    }
-                }
-            } else {
+            runBlocking {
                 appContainer.incidentsRepository.insertIncident(incident)
             }
         }
     }
 
-    private fun validateInput(uiState: IncidentDetails = incidentUiState.incidentDetails): Boolean {
+    private fun validateInput(
+        uiState: Incident = incidentUiState.incident
+    ): Boolean {
         return with(uiState) {
             title.isNotBlank() && description.isNotBlank()
         }
@@ -81,42 +79,21 @@ class IncidentEntryViewModel(
 }
 
 data class IncidentUiState(
-    val incidentDetails: IncidentDetails = IncidentDetails(),
-    val isEntryValid: Boolean = false,
+    var incident: Incident = emptyIncident(),
+    var isEntryValid: Boolean = false,
     var community: Community? = null,
     var user: User? = null
 )
 
-data class IncidentDetails(
-    val id: Int = 0,
-    val communityId: Int = 0,
-    val userId: Int = 0,
-    val title: String = "",
-    val description: String = "",
-    val latitude: Double? = null,
-    val longitude: Double? = null,
-)
-
-fun IncidentDetails.toIncident(
-    community: Community? = null,
-    user: User? = null,
-    specificLatitude: Double? = null,
-    specificLongitude: Double? = null,
-): Incident {
+fun emptyIncident(): Incident {
     return Incident(
-        id = id,
-        communityId = 1,
-        userId = 1,
-//        communityId = if (communityId == 0 && community != null) community.id else {
-//            communityId
-//        },
-//        userId = if (userId == 0 && user != null) user.id else {
-//            userId
-//        },
-        title = title,
-        description = description,
-        latitude = specificLatitude ?: latitude,
-        longitude = specificLongitude ?: longitude,
+        id = 0,
+        communityId = 0,
+        userId = 0,
+        title = "",
+        description = "",
+        latitude = null,
+        longitude = null,
         createdAt = Date(),
         updatedAt = Date()
     )
@@ -124,19 +101,7 @@ fun IncidentDetails.toIncident(
 
 fun Incident.toIncidentUiState(isEntryValid: Boolean = false): IncidentUiState {
     return IncidentUiState(
-        incidentDetails = this.toIncidentDetails(),
+        incident = this,
         isEntryValid = isEntryValid
-    )
-}
-
-fun Incident.toIncidentDetails(): IncidentDetails {
-    return IncidentDetails(
-        id = id,
-        communityId = communityId,
-        userId = userId,
-        title = title,
-        description = description,
-        latitude = latitude,
-        longitude = longitude
     )
 }

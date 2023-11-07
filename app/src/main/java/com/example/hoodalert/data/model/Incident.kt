@@ -27,29 +27,29 @@ import java.util.Date
 )
 data class Incident(
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    var id: Int,
 
     @ColumnInfo(name = "community_id")
-    val communityId: Int,
+    var communityId: Int,
 
     @ColumnInfo(name = "user_id")
-    val userId: Int,
+    var userId: Int,
 
     @ColumnInfo(name = "title")
-    val title: String,
+    var title: String,
 
     @ColumnInfo(name = "description")
-    val description: String,
+    var description: String,
 
     @ColumnInfo(name = "latitude")
-    val latitude: Double?,
+    var latitude: Double?,
 
     @ColumnInfo(name = "longitude")
-    val longitude: Double?,
+    var longitude: Double?,
 
     @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
-    val createdAt: Date,
+    var createdAt: Date,
 
     @ColumnInfo(name = "updated_at", defaultValue = "CURRENT_TIMESTAMP")
-    val updatedAt: Date,
+    var updatedAt: Date,
 )

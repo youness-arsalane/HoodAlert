@@ -3,6 +3,7 @@ package com.example.hoodalert.ui.screens.incidents
 import android.content.Intent
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -25,7 +26,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hoodalert.R
-import com.example.hoodalert.data.model.Incident
 import com.example.hoodalert.ui.AppViewModelProvider
 import com.example.hoodalert.ui.components.HoodAlertTopAppBar
 import com.example.hoodalert.ui.navigation.NavigationDestination
@@ -61,45 +61,60 @@ fun EditScreen(
         modifier = modifier
     ) { innerPadding ->
         EntryBody(
-            viewModel = viewModel,
             incidentUiState = viewModel.incidentUiState,
             onIncidentValueChange = { viewModel.updateUiState(it) },
+            showImages = true,
             onSaveClick = {
                 coroutineScope.launch {
                     viewModel.updateIncident()
                     navigateBack()
                 }
             },
-            onImageAdded = {
-                navigateBack()
+            onAddImage = { uri ->
+                Log.d("HOOD_ALERT_DEBUG", "EditScreen onAddImage")
+                Log.d("HOOD_ALERT_DEBUG", "EditScreen uri + $uri")
+                coroutineScope.launch {
+                    Log.d("HOOD_ALERT_DEBUG", "EditScreen coroutineScope.launch")
+                    viewModel.addIncidentImage(uri)
+                    navigateBack()
+                }
             },
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier
+                .padding(innerPadding)
         )
     }
 }
 
 @Composable
 fun ImageSelectionScreen(
-    incident: Incident,
-    viewModel: IncidentEditViewModel,
-    onImageAdded: () -> Unit = {}
+    onAddImage: (Uri) -> Unit = {}
 ) {
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    val getContent =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+//    val getContent = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+//            selectedImageUri = uri
+//        }
+
+    val getContent = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            Log.d("HOOD_ALERT_DEBUG", "rememberLauncherForActivityResult 1 + $result")
+            Log.d("HOOD_ALERT_DEBUG", "rememberLauncherForActivityResult 2 + " + result.resultCode.toString())
             if (result.resultCode == ComponentActivity.RESULT_OK) {
                 val data: Intent? = result.data
+                Log.d("HOOD_ALERT_DEBUG", "rememberLauncherForActivityResult 3 + $data")
+                Log.d("HOOD_ALERT_DEBUG", "rememberLauncherForActivityResult 4 + ${data?.data}")
                 data?.data?.let { uri ->
+                    Log.d("HOOD_ALERT_DEBUG", "rememberLauncherForActivityResult 5 + $uri")
                     selectedImageUri = uri
                 }
             }
         }
 
     LaunchedEffect(selectedImageUri) {
+        Log.d("HOOD_ALERT_DEBUG", "LaunchedEffect")
         if (selectedImageUri != null) {
-            viewModel.addIncidentImage(incident, selectedImageUri!!)
-            onImageAdded()
+            Log.d("HOOD_ALERT_DEBUG", "onAddImage")
+            Log.d("HOOD_ALERT_DEBUG", "selectedImageUri + " + selectedImageUri.toString())
+            onAddImage(selectedImageUri!!)
         }
     }
 
@@ -108,80 +123,13 @@ fun ImageSelectionScreen(
     ) {
         Button(
             onClick = {
-                val intent =
-                    Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                 getContent.launch(intent)
+//                getContent.launch("image/*")
             },
             modifier = Modifier.padding(8.dp)
         ) {
             Text(text = stringResource(id = R.string.select_image))
         }
-    }
-}
-
-
-//@Composable
-//fun ImageCapture() {
-//    val imageCapture = ImageCapture.Builder()
-//        .build()
-//
-//    val captureButton = remember { mutableStateOf(false) }
-//
-//    val context = LocalContext.current
-//
-//
-//    Button(
-//        onClick = {
-//            val imageCaptureOptions = ImageCapture.OutputFileOptions.Builder(imageFile).build()
-//            imageCapture.takePicture(
-//                imageCaptureOptions,
-//                ContextCompat.getMainExecutor(context),
-//                object : ImageCapture.OnImageSavedCallback {
-//                    override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-//                        // De afbeelding is succesvol opgeslagen
-//                    }
-//
-//                    override fun onError(exception: ImageCaptureException) {
-//                        // Er is een fout opgetreden bij het opslaan van de afbeelding
-//                    }
-//                }
-//            )
-//        }
-//    ) {
-//        Text("Capture")
-//    }
-//}
-//
-//@Composable
-//fun uploadImage() {
-//    val context = LocalContext.current
-//
-//    val previewView = rememberUpdatedState(PreviewView(context))
-//
-//    val imageCapture = ImageCapture.Builder()
-//        .build()
-//
-//    val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-//
-//    cameraProviderFuture.addListener({
-//        val cameraProvider = cameraProviderFuture.get()
-//
-//        val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-//
-//        val camera = cameraProvider.bindToLifecycle(
-//            this,
-//            cameraSelector,
-//            previewView.preview,
-//            imageCapture
-//        )
-//    }, ContextCompat.getMainExecutor(context))
-//
-//}
-
-@Preview(showBackground = true)
-@Composable
-fun EditScreenPreview() {
-    HoodAlertTheme {
-        EditScreen(navigateBack = { /*Do nothing*/ }, onNavigateUp = { /*Do nothing*/ })
     }
 }

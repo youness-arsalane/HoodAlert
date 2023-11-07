@@ -3,7 +3,6 @@ package com.example.hoodalert.data
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.hoodalert.data.repository.CommunitiesRepository
 import com.example.hoodalert.data.repository.CommunityUsersRepository

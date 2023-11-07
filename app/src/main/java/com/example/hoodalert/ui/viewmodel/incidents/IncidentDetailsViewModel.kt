@@ -15,22 +15,21 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import java.util.Date
 
 class IncidentDetailsViewModel(
     savedStateHandle: SavedStateHandle,
     private val appContainer: AppDataContainer
 ) : ViewModel() {
-
     private val incidentId: Int =
         checkNotNull(savedStateHandle[IncidentDetailsDestination.incidentIdArg])
-
     private val incidentStream = appContainer.incidentsRepository.getIncidentStream(incidentId)
         .filterNotNull()
 
     val uiState: StateFlow<IncidentDetailsUiState> = incidentStream
         .map {
             IncidentDetailsUiState(
-                incidentDetails = it.toIncidentDetails(),
+                incident = it,
                 community = appContainer.communitiesRepository.getCommunityStream(incidentStream.first().communityId)
                     .filterNotNull()
                     .first(),
@@ -45,7 +44,7 @@ class IncidentDetailsViewModel(
         )
 
     suspend fun deleteIncident() {
-        appContainer.incidentsRepository.deleteIncident(uiState.value.incidentDetails.toIncident())
+        appContainer.incidentsRepository.deleteIncident(uiState.value.incident)
     }
 
     fun getIncidentImages(incident: Incident) =
@@ -57,7 +56,17 @@ class IncidentDetailsViewModel(
 }
 
 data class IncidentDetailsUiState(
-    val incidentDetails: IncidentDetails = IncidentDetails(),
+    val incident: Incident = Incident(
+        id = 0,
+        communityId = 0,
+        userId = 0,
+        title = "",
+        description = "",
+        latitude = null,
+        longitude = null,
+        createdAt = Date(),
+        updatedAt = Date()
+    ),
     var community: Community? = null,
     var user: User? = null,
 )

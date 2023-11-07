@@ -27,20 +27,20 @@ import java.util.Date
 )
 data class CommunityUser(
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    var id: Int,
 
     @ColumnInfo(name = "community_id")
-    val communityId: Int,
+    var communityId: Int,
 
     @ColumnInfo(name = "user_id")
-    val userId: Int,
+    var userId: Int,
 
     @ColumnInfo(name = "is_admin")
-    val isAdmin: Boolean,
+    var isAdmin: Boolean,
 
     @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
-    val createdAt: Date,
+    var createdAt: Date,
 
     @ColumnInfo(name = "updated_at", defaultValue = "CURRENT_TIMESTAMP")
-    val updatedAt: Date
+    var updatedAt: Date
 )

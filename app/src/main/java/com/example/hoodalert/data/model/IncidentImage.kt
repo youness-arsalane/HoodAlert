@@ -20,17 +20,17 @@ import java.util.Date
 )
 data class IncidentImage(
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    var id: Int,
 
     @ColumnInfo(name = "incident_id")
-    val incidentId: Int,
+    var incidentId: Int,
 
     @ColumnInfo(name = "path")
-    val path: String,
+    var path: String,
 
     @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
-    val createdAt: Date,
+    var createdAt: Date,
 
     @ColumnInfo(name = "updated_at", defaultValue = "CURRENT_TIMESTAMP")
-    val updatedAt: Date,
+    var updatedAt: Date,
 )

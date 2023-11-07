@@ -10,23 +10,23 @@ import java.util.Date
 )
 data class User(
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    var id: Int,
 
     @ColumnInfo(name = "email")
-    val email: String,
+    var email: String,
 
     @ColumnInfo(name = "first_name")
-    val firstName: String,
+    var firstName: String,
 
     @ColumnInfo(name = "last_name")
-    val lastName: String,
+    var lastName: String,
 
     @ColumnInfo(name = "password")
-    val password: String,
+    var password: String,
 
     @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
-    val createdAt: Date,
+    var createdAt: Date,
 
     @ColumnInfo(name = "updated_at", defaultValue = "CURRENT_TIMESTAMP")
-    val updatedAt: Date
+    var updatedAt: Date
 )
