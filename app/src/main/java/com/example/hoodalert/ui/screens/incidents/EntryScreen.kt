@@ -1,7 +1,5 @@
 package com.example.hoodalert.ui.screens.incidents
 
-import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -95,19 +93,13 @@ fun EntryBody(
     incidentUiState: IncidentUiState,
     onSaveClick: () -> Unit,
     modifier: Modifier = Modifier,
-    showImages: Boolean = false,
-    onIncidentValueChange: (Incident) -> Unit,
-    onAddImage: (Uri) -> Unit = {}
+    onIncidentValueChange: (Incident) -> Unit
 ) {
     Column(
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         Text(text = "Community: " + incidentUiState.community?.name.toString())
-
-        if (showImages) {
-            ImageSelectionScreen(onAddImage = onAddImage)
-        }
 
         InputForm(
             incident = incidentUiState.incident,

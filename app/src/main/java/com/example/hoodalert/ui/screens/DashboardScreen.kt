@@ -97,13 +97,6 @@ fun DashboardScreen(
                                 },
                                 modifier = Modifier.weight(1f)
                             )
-//                            CenteredCard(
-//                                text = stringResource(R.string.incidents),
-//                                onClick = {
-//                                    navController?.navigate(IncidentListDestination.route)
-//                                },
-//                                modifier = Modifier.weight(1f)
-//                            )
                         }
                     }
                 }

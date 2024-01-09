@@ -49,7 +49,13 @@
     <string name="name">Name</string>
     <string name="leave">Leave</string>
     <string name="user">User</string>
-    <string name="select_image">Select image</string>
+
+    <string name="street">Street</string>
+    <string name="house_number">House number</string>
+    <string name="zipcode">Zipcode</string>
+    <string name="city">City</string>
+    <string name="country">Country</string>
+
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
 </resources>

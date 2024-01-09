@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.hoodalert.data.AppDataContainer
 import com.example.hoodalert.data.model.Community
 import com.example.hoodalert.data.model.Incident
-import com.example.hoodalert.data.model.IncidentImage
 import com.example.hoodalert.data.model.User
 import com.example.hoodalert.ui.screens.incidents.IncidentDetailsDestination
 import kotlinx.coroutines.flow.SharingStarted
@@ -47,9 +46,6 @@ class IncidentDetailsViewModel(
         appContainer.incidentsRepository.deleteIncident(uiState.value.incident)
     }
 
-    fun getIncidentImages(incident: Incident) =
-        appContainer.incidentImagesRepository.findByIncident(incident)
-
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
@@ -62,6 +58,11 @@ data class IncidentDetailsUiState(
         userId = 0,
         title = "",
         description = "",
+        street = "",
+        houseNumber = "",
+        zipcode = "",
+        city = "",
+        country = "",
         latitude = null,
         longitude = null,
         createdAt = Date(),
@@ -73,8 +74,4 @@ data class IncidentDetailsUiState(
 
 fun User.getFullName(): String {
     return this.firstName + " " + this.lastName
-}
-
-suspend fun Incident.getIncidentImages(incidentDetailsViewModel: IncidentDetailsViewModel): List<IncidentImage> {
-    return incidentDetailsViewModel.getIncidentImages(this).first()
 }

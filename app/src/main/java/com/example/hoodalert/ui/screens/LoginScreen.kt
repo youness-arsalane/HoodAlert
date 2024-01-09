@@ -1,6 +1,6 @@
 package com.example.hoodalert.ui.screens
 
-import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -80,6 +81,7 @@ fun LoginScreen(
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val sharedPreferencesManager = SharedPreferencesManager(navController.context)
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -120,7 +122,11 @@ fun LoginScreen(
                                                 }
                                             },
                                             onLoginFailed = {
-                                                Log.d("HOOD_ALERT_DEBUG", "User is not found")
+                                                Toast.makeText(
+                                                    context,
+                                                    "User is not found",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
                                             },
                                         )
                                     }

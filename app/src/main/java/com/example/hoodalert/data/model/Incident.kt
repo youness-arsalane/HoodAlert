@@ -41,6 +41,21 @@ data class Incident(
     @ColumnInfo(name = "description")
     var description: String,
 
+    @ColumnInfo(name = "street")
+    var street: String,
+
+    @ColumnInfo(name = "houseNumber")
+    var houseNumber: String,
+
+    @ColumnInfo(name = "zipcode")
+    var zipcode: String,
+
+    @ColumnInfo(name = "city")
+    var city: String,
+
+    @ColumnInfo(name = "country")
+    var country: String,
+
     @ColumnInfo(name = "latitude")
     var latitude: Double?,
 

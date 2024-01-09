@@ -5,19 +5,12 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.annotation.StringRes
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -34,35 +27,25 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hoodalert.R
 import com.example.hoodalert.data.model.Incident
-import com.example.hoodalert.data.model.IncidentImage
 import com.example.hoodalert.ui.AppViewModelProvider
 import com.example.hoodalert.ui.components.HoodAlertTopAppBar
 import com.example.hoodalert.ui.navigation.NavigationDestination
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentDetailsUiState
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentDetailsViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.getFullName
-import com.example.hoodalert.ui.viewmodel.incidents.getIncidentImages
 import kotlinx.coroutines.launch
 import java.io.IOException
 
@@ -86,11 +69,6 @@ fun DetailsScreen(
 
     val incident = uiState.value.incident
 
-    var incidentImageList by remember { mutableStateOf(emptyList<IncidentImage>()) }
-    LaunchedEffect(incident) {
-        incidentImageList = incident.getIncidentImages(viewModel)
-    }
-
     Scaffold(
         topBar = {
             HoodAlertTopAppBar(
@@ -113,7 +91,6 @@ fun DetailsScreen(
         }, modifier = modifier
     ) { innerPadding ->
         DetailsBody(
-            incidentImageList = incidentImageList,
             incidentDetailsUiState = uiState.value,
             onDelete = {
                 coroutineScope.launch {
@@ -130,7 +107,6 @@ fun DetailsScreen(
 
 @Composable
 private fun DetailsBody(
-    incidentImageList: List<IncidentImage>,
     incidentDetailsUiState: IncidentDetailsUiState,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
@@ -142,7 +118,6 @@ private fun DetailsBody(
     ) {
         var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
         Details(
-            incidentImageList = incidentImageList,
             incidentDetailsUiState = incidentDetailsUiState,
             incident = incidentDetailsUiState.incident,
             modifier = Modifier.fillMaxWidth()
@@ -170,13 +145,10 @@ private fun DetailsBody(
 
 @Composable
 fun Details(
-    incidentImageList: List<IncidentImage>,
     incidentDetailsUiState: IncidentDetailsUiState,
     incident: Incident,
     modifier: Modifier = Modifier
 ) {
-    ImageSlider(incidentImageList)
-
     Card(
         modifier = modifier, colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -218,6 +190,41 @@ fun Details(
                 )
             )
             DetailsRow(
+                labelResID = R.string.street,
+                incidentDetail = incident.street,
+                modifier = Modifier.padding(
+                    horizontal = 16.dp
+                )
+            )
+            DetailsRow(
+                labelResID = R.string.house_number,
+                incidentDetail = incident.houseNumber,
+                modifier = Modifier.padding(
+                    horizontal = 16.dp
+                )
+            )
+            DetailsRow(
+                labelResID = R.string.zipcode,
+                incidentDetail = incident.zipcode,
+                modifier = Modifier.padding(
+                    horizontal = 16.dp
+                )
+            )
+            DetailsRow(
+                labelResID = R.string.city,
+                incidentDetail = incident.city,
+                modifier = Modifier.padding(
+                    horizontal = 16.dp
+                )
+            )
+            DetailsRow(
+                labelResID = R.string.country,
+                incidentDetail = incident.country,
+                modifier = Modifier.padding(
+                    horizontal = 16.dp
+                )
+            )
+            DetailsRow(
                 labelResID = R.string.latitude,
                 incidentDetail = if (incident.latitude != null) "%.6f".format(incident.latitude!! / 1.0)
                 else "Niet bekend",
@@ -235,34 +242,6 @@ fun Details(
             )
         }
 
-    }
-}
-
-@Composable
-fun ImageSlider(incidentImageList: List<IncidentImage>) {
-    val context = LocalContext.current
-    val density = LocalDensity.current.density
-
-    LazyRow(
-        modifier = Modifier
-            .fillMaxSize()
-            .height(100.dp)
-            .background(Color.Gray)
-    ) {
-        items(items = incidentImageList, key = { it.id }) { incidentImage ->
-            val bitmap = loadBitmap(context.contentResolver, incidentImage.path.toUri())
-            if (bitmap != null) {
-                Image(
-                    bitmap = bitmap.asImageBitmap(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .width((100 * density).dp)
-                        .height((100 * density).dp)
-                )
-            }
-        }
     }
 }
 
