@@ -1,4 +1,4 @@
-package com.example.hoodalert.ui.viewmodel
+package com.example.hoodalert.ui.viewmodel.auth
 
 import androidx.lifecycle.ViewModel
 import com.example.hoodalert.data.AppDataContainer

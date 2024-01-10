@@ -7,8 +7,8 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.hoodalert.HoodAlertApplication
-import com.example.hoodalert.ui.viewmodel.LoginViewModel
-import com.example.hoodalert.ui.viewmodel.RegisterViewModel
+import com.example.hoodalert.ui.viewmodel.auth.LoginViewModel
+import com.example.hoodalert.ui.viewmodel.auth.RegisterViewModel
 import com.example.hoodalert.ui.viewmodel.communities.CommunityDetailsViewModel
 import com.example.hoodalert.ui.viewmodel.communities.CommunityEditViewModel
 import com.example.hoodalert.ui.viewmodel.communities.CommunityEntryViewModel
@@ -17,6 +17,7 @@ import com.example.hoodalert.ui.viewmodel.incidents.IncidentDetailsViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentEditViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentEntryViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentListViewModel
+import com.example.inventory.ui.map.MapViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
@@ -73,6 +74,10 @@ object AppViewModelProvider {
 
         initializer {
             IncidentListViewModel(hoodAlertApplication().container)
+        }
+
+        initializer {
+            MapViewModel(hoodAlertApplication().container)
         }
     }
 }

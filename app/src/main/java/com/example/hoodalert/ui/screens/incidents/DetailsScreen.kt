@@ -1,9 +1,5 @@
 package com.example.hoodalert.ui.screens.incidents
 
-import android.content.ContentResolver
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -47,7 +43,6 @@ import com.example.hoodalert.ui.viewmodel.incidents.IncidentDetailsUiState
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentDetailsViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.getFullName
 import kotlinx.coroutines.launch
-import java.io.IOException
 
 object IncidentDetailsDestination : NavigationDestination {
     override val route = "incident_details"
@@ -242,16 +237,6 @@ fun Details(
             )
         }
 
-    }
-}
-
-@Composable
-fun loadBitmap(contentResolver: ContentResolver, uri: Uri): Bitmap? {
-    return try {
-        val inputStream = contentResolver.openInputStream(uri)
-        BitmapFactory.decodeStream(inputStream)
-    } catch (e: IOException) {
-        null
     }
 }
 

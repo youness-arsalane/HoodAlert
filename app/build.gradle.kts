@@ -76,8 +76,12 @@ dependencies {
     implementation("androidx.camera:camera-view:1.1.0")
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation("com.google.android.gms:play-services-location:18.0.0")
-    implementation("com.mapbox.maps:android:10.14.0")
-    implementation("com.mapbox.mapboxsdk:mapbox-android-sdk:9.6.1")
+    implementation("com.google.maps.android:maps-compose:2.11.5")
+    implementation("com.google.maps.android:android-maps-utils:3.4.0")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
 
     //Room
     implementation("androidx.room:room-runtime:2.5.2")

@@ -14,7 +14,6 @@ import com.example.hoodalert.ui.screens.communities.CommunityEditDestination
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.Date
 
 class IncidentEntryViewModel(
@@ -52,21 +51,7 @@ class IncidentEntryViewModel(
         }
 
         val incident = incidentUiState.incident
-        if (incident.id != 0) {
-            appContainer.incidentsRepository.insertIncident(incident)
-            return
-        }
-
-        appContainer.getCurrentLocation { location ->
-            if (location != null) {
-                incident.latitude = location.first
-                incident.longitude = location.second
-            }
-
-            runBlocking {
-                appContainer.incidentsRepository.insertIncident(incident)
-            }
-        }
+        appContainer.incidentsRepository.insertIncident(incident)
     }
 
     private fun validateInput(

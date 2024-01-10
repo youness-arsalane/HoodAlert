@@ -17,10 +17,10 @@ import com.example.hoodalert.data.model.User
 import com.example.hoodalert.ui.AppViewModelProvider
 import com.example.hoodalert.ui.screens.DashboardDestination
 import com.example.hoodalert.ui.screens.DashboardScreen
-import com.example.hoodalert.ui.screens.LoginDestination
-import com.example.hoodalert.ui.screens.LoginScreen
-import com.example.hoodalert.ui.screens.RegisterDestination
-import com.example.hoodalert.ui.screens.RegisterScreen
+import com.example.hoodalert.ui.screens.auth.LoginDestination
+import com.example.hoodalert.ui.screens.auth.LoginScreen
+import com.example.hoodalert.ui.screens.auth.RegisterDestination
+import com.example.hoodalert.ui.screens.auth.RegisterScreen
 import com.example.hoodalert.ui.screens.communities.CommunityDetailsDestination
 import com.example.hoodalert.ui.screens.communities.CommunityEditDestination
 import com.example.hoodalert.ui.screens.communities.CommunityEntryDestination
@@ -29,7 +29,9 @@ import com.example.hoodalert.ui.screens.incidents.IncidentDetailsDestination
 import com.example.hoodalert.ui.screens.incidents.IncidentEditDestination
 import com.example.hoodalert.ui.screens.incidents.IncidentEntryDestination
 import com.example.hoodalert.ui.screens.incidents.IncidentListDestination
-import com.example.hoodalert.ui.viewmodel.LoginViewModel
+import com.example.hoodalert.ui.viewmodel.auth.LoginViewModel
+import com.example.inventory.ui.map.MapDestination
+import com.example.inventory.ui.map.MapScreen
 import kotlinx.coroutines.launch
 import com.example.hoodalert.ui.screens.communities.DetailsScreen as CommunityDetailsScreen
 import com.example.hoodalert.ui.screens.communities.EditScreen as CommunityEditScreen
@@ -81,6 +83,7 @@ fun HoodAlertNavHost(
             DashboardScreen(
                 navController = navController,
                 loggedInUser = loggedInUser,
+                navigateToMap = { navController.navigate(MapDestination.route) },
                 onLogout = {
                     loggedInUser = null
                     loginViewModel.logout()
@@ -173,6 +176,11 @@ fun HoodAlertNavHost(
         ) {
             IncidentEditScreen(
                 navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() }
+            )
+        }
+        composable(route = MapDestination.route) {
+            MapScreen(
                 onNavigateUp = { navController.navigateUp() }
             )
         }

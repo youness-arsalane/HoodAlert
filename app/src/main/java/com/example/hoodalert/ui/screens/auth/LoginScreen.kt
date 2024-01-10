@@ -1,4 +1,4 @@
-package com.example.hoodalert.ui.screens
+package com.example.hoodalert.ui.screens.auth
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
@@ -61,7 +61,7 @@ import com.example.hoodalert.ui.components.EmailStateSaver
 import com.example.hoodalert.ui.components.PasswordState
 import com.example.hoodalert.ui.components.TextFieldState
 import com.example.hoodalert.ui.navigation.NavigationDestination
-import com.example.hoodalert.ui.viewmodel.LoginViewModel
+import com.example.hoodalert.ui.viewmodel.auth.LoginViewModel
 import com.example.hoodalert.util.supportWideScreen
 import kotlinx.coroutines.launch
 

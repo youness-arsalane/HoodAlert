@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -46,6 +47,7 @@ object DashboardDestination : NavigationDestination {
 fun DashboardScreen(
     navController: NavController? = null,
     loggedInUser: User?,
+    navigateToMap: () -> Unit,
     onLogout: () -> Unit
 ) {
     if (loggedInUser == null) {
@@ -58,6 +60,13 @@ fun DashboardScreen(
                 title = stringResource(id = R.string.dashboard),
                 canNavigateBack = false,
                 actions = {
+                    IconButton(onClick = navigateToMap) {
+                        Icon(
+                            imageVector = Icons.Filled.LocationOn,
+                            contentDescription = stringResource(id = R.string.map),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                     IconButton(onClick = onLogout) {
                         Icon(
                             imageVector = Icons.Filled.Logout,
@@ -149,7 +158,9 @@ fun DashboardScreenPreview() {
                 password = "",
                 createdAt = Date(),
                 updatedAt = Date(),
-            )
-        ) {}
+            ),
+            navigateToMap = {},
+            onLogout = {}
+        )
     }
 }

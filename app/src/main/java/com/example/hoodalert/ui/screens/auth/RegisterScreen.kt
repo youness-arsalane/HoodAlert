@@ -1,4 +1,4 @@
-package com.example.hoodalert.ui.screens
+package com.example.hoodalert.ui.screens.auth
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,9 +32,9 @@ import com.example.hoodalert.R
 import com.example.hoodalert.ui.AppViewModelProvider
 import com.example.hoodalert.ui.components.HoodAlertTopAppBar
 import com.example.hoodalert.ui.navigation.NavigationDestination
-import com.example.hoodalert.ui.viewmodel.RegisterViewModel
-import com.example.hoodalert.ui.viewmodel.UserDetails
-import com.example.hoodalert.ui.viewmodel.UserUiState
+import com.example.hoodalert.ui.viewmodel.auth.RegisterViewModel
+import com.example.hoodalert.ui.viewmodel.auth.UserDetails
+import com.example.hoodalert.ui.viewmodel.auth.UserUiState
 import kotlinx.coroutines.launch
 
 object RegisterDestination : NavigationDestination {
