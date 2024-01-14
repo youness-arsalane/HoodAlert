@@ -3,13 +3,10 @@ package com.example.hoodalert.ui.screens.incidents
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -49,7 +46,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hoodalert.R
 import com.example.hoodalert.data.model.Incident
 import com.example.hoodalert.data.model.User
-import com.example.hoodalert.data.service.GeocodingService
 import com.example.hoodalert.ui.AppViewModelProvider
 import com.example.hoodalert.ui.components.HoodAlertTopAppBar
 import com.example.hoodalert.ui.navigation.NavigationDestination
@@ -59,8 +55,6 @@ import com.example.hoodalert.ui.viewmodel.incidents.IncidentUiState
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.launch
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.Date
 
 
@@ -69,22 +63,6 @@ object IncidentEntryDestination : NavigationDestination {
     override val titleRes = R.string.incident_entry_title
     const val communityIdArg = "communityId"
     val routeWithArgs = "${route}/{$communityIdArg}"
-}
-
-private fun areLocationPermissionsAlreadyGranted(context: Context): Boolean {
-    return ContextCompat.checkSelfPermission(
-        context,
-        Manifest.permission.ACCESS_FINE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
-}
-
-private fun openApplicationSettings(context: Context) {
-    Intent(
-        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-        Uri.fromParts("package", context.packageName, null)
-    ).also {
-        context.startActivity(it)
-    }
 }
 
 @SuppressLint("MissingPermission")
@@ -103,11 +81,15 @@ fun EntryScreen(
 
     val context = LocalContext.current
     val activity = context as Activity
+    val coroutineScope = rememberCoroutineScope()
     var coordinates: Pair<Double, Double>? by remember { mutableStateOf(null) }
 
     var locationPermissionsGranted by remember {
         mutableStateOf(
-            areLocationPermissionsAlreadyGranted(context)
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
         )
     }
 
@@ -117,9 +99,9 @@ fun EntryScreen(
         )
     }
 
-    var shouldDirectUserToApplicationSettings by remember {
-        mutableStateOf(false)
-    }
+    var shouldDirectUserToApplicationSettings by remember { mutableStateOf(false) }
+    var shouldLaunchPermissionRationale by remember { mutableStateOf(false) }
+    var retrieveLocation by remember { mutableStateOf(false) }
 
     val locationPermissions = arrayOf(
         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -140,71 +122,74 @@ fun EntryScreen(
                     "Permission not granted",
                     Toast.LENGTH_SHORT
                 ).show()
-            }
 
-            if (!locationPermissionsGranted) {
                 shouldShowPermissionRationale =
                     activity.shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)
             }
+
             shouldDirectUserToApplicationSettings =
                 !shouldShowPermissionRationale && !locationPermissionsGranted
         })
 
     val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(key1 = lifecycleOwner, effect = {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_START &&
-                !locationPermissionsGranted &&
-                !shouldShowPermissionRationale
-            ) {
-                locationPermissionLauncher.launch(locationPermissions)
+    DisposableEffect(
+        key1 = lifecycleOwner,
+        effect = {
+            val observer = LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_START &&
+                    !locationPermissionsGranted &&
+                    !shouldShowPermissionRationale
+                ) {
+                    shouldLaunchPermissionRationale = true
+//                    locationPermissionLauncher.launch(locationPermissions)
+                }
+            }
+            lifecycleOwner.lifecycle.addObserver(observer)
+            onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
             }
         }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
     )
 
     if (shouldDirectUserToApplicationSettings) {
-        openApplicationSettings(context)
+        Intent(
+            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            Uri.fromParts("package", context.packageName, null)
+        ).also {
+            context.startActivity(it)
+        }
     }
 
-    if (locationPermissionsGranted) {
-        val fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+    if (retrieveLocation && locationPermissionsGranted) {
+        retrieveLocation = false
+
+        val fusedLocationClient: FusedLocationProviderClient =
+            LocationServices.getFusedLocationProviderClient(context)
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location ->
                 if (location != null) {
                     val latitude = location.latitude
                     val longitude = location.longitude
-                    coordinates = Pair(latitude, longitude)
 
                     val incidentUiState = viewModel.incidentUiState
                     val incidentDetails = incidentUiState.incident
+
                     viewModel.updateUiState(
                         incidentDetails.copy(
                             latitude = latitude,
                             longitude = longitude
                         )
                     )
+
+                    coordinates = Pair(latitude, longitude)
+                    coroutineScope.launch {
+                        viewModel.loadAddressByCoordinates(
+                            coordinates = coordinates!!
+                        )
+                    }
                 }
             }
     }
-
-    if (coordinates != null) {
-        val incidentUiState = viewModel.incidentUiState
-        val incidentDetails = incidentUiState.incident
-
-        LoadAddress(
-            incident = incidentDetails,
-            latitude = coordinates!!.first,
-            longitude = coordinates!!.second,
-            onValueChange = { viewModel.updateUiState(it) }
-        )
-    }
-
-    val coroutineScope = rememberCoroutineScope()
 
     viewModel.incidentUiState.user = loggedInUser
     viewModel.incidentUiState.incident.userId = loggedInUser.id
@@ -227,17 +212,40 @@ fun EntryScreen(
     ) { innerPadding ->
         EntryBody(
             incidentUiState = viewModel.incidentUiState,
-            onIncidentValueChange = { viewModel.updateUiState(it) },
             onSaveClick = {
                 coroutineScope.launch {
                     viewModel.saveIncident()
                     navigateBack()
                 }
             },
+            onValueChange = { viewModel.updateUiState(it) },
             modifier = Modifier
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            coordinates = coordinates,
+            onLoadAddress = {
+                retrieveLocation = true
+
+                if (shouldLaunchPermissionRationale) {
+                    locationPermissionLauncher.launch(locationPermissions)
+                } else if (coordinates != null) {
+                    try {
+                        coroutineScope.launch {
+                            viewModel.loadAddressByCoordinates(
+                                coordinates = coordinates!!
+                            )
+                        }
+                    } catch (e: Exception) {
+//                        throw e
+                        Toast.makeText(
+                            context,
+                            "Error: " + e.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
         )
     }
 }
@@ -246,19 +254,73 @@ fun EntryScreen(
 fun EntryBody(
     incidentUiState: IncidentUiState,
     onSaveClick: () -> Unit,
+    onValueChange: (Incident) -> Unit,
     modifier: Modifier = Modifier,
-    onIncidentValueChange: (Incident) -> Unit
+    coordinates: Pair<Double, Double>? = null,
+    onLoadAddress: () -> Unit = {}
 ) {
+
     Column(
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         Text(text = "Community: " + incidentUiState.community?.name.toString())
 
-        InputForm(
-            incident = incidentUiState.incident,
-            onValueChange = onIncidentValueChange,
-            modifier = Modifier.fillMaxWidth()
+        val incident = incidentUiState.incident
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            OutlinedTextField(
+                value = incident.title,
+                onValueChange = {
+                    onValueChange(
+                        incident.copy(title = it)
+                    )
+                },
+                label = { Text(stringResource(R.string.title)) },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+            OutlinedTextField(
+                value = incident.description,
+                onValueChange = {
+                    onValueChange(
+                        incident.copy(description = it)
+                    )
+                },
+                label = { Text(stringResource(R.string.description)) },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                minLines = 3
+            )
+        }
+
+        Button(
+            onClick = onLoadAddress
+        ) {
+            Text(text = "Load current address")
+        }
+
+        AddressFields(
+            incident = incident,
+            coordinates = coordinates,
+            onValueChange = onValueChange
+        )
+
+        Text(
+            text = stringResource(R.string.required_fields),
+            modifier = Modifier.padding(start = 16.dp)
         )
 
         Button(
@@ -273,143 +335,22 @@ fun EntryBody(
 }
 
 @Composable
-fun InputForm(
-    incident: Incident,
-    modifier: Modifier = Modifier,
-    onValueChange: (Incident) -> Unit = {},
-    enabled: Boolean = true
-) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        OutlinedTextField(
-            value = incident.title,
-            onValueChange = {
-                onValueChange(
-                    incident.copy(title = it)
-                )
-            },
-            label = { Text(stringResource(R.string.title)) },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            ),
-            modifier = Modifier.fillMaxWidth(),
-            enabled = enabled,
-            singleLine = true
-        )
-        OutlinedTextField(
-            value = incident.description,
-            onValueChange = {
-                onValueChange(
-                    incident.copy(description = it)
-                )
-            },
-            label = { Text(stringResource(R.string.description)) },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            ),
-            modifier = Modifier.fillMaxWidth(),
-            enabled = enabled,
-            minLines = 3
-        )
-    }
-
-    AddressFields(
-        incident = incident,
-        onValueChange = onValueChange,
-        enabled = enabled
-    )
-
-    if (enabled) {
-        Text(
-            text = stringResource(R.string.required_fields),
-            modifier = Modifier.padding(start = 16.dp)
-        )
-    }
-}
-
-@Composable
-fun LoadAddress(
-    incident: Incident,
-    latitude: Double,
-    longitude: Double,
-    onValueChange: (Incident) -> Unit = {},
-) {
-    val context = LocalContext.current
-
-    val app: ApplicationInfo = context.getPackageManager()
-        .getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA)
-    val bundle = app.metaData
-
-    val apiKey = bundle.getString("com.google.android.geo.API_KEY").toString()
-
-    val geocodingService = remember {
-        Retrofit.Builder()
-            .baseUrl("https://maps.googleapis.com/")
-            .addConverterFactory(MoshiConverterFactory.create())
-            .build()
-            .create(GeocodingService::class.java)
-    }
-
-    var locationLoaded by remember { mutableStateOf(false) }
-
-    if (!locationLoaded) {
-        LaunchedEffect(latitude, longitude) {
-            try {
-                val response = geocodingService.getAddresses("$latitude,$longitude", apiKey)
-                locationLoaded = true
-
-                val addressComponents = response.results.firstOrNull()
-
-                if (addressComponents != null) {
-                    val components = addressComponents.address_components
-                    if (components != null) {
-                        val street = components.find { "route" in it.types }?.long_name ?: ""
-                        val houseNumber =
-                            components.find { "street_number" in it.types }?.long_name ?: ""
-                        val zipcode = components.find { "postal_code" in it.types }?.long_name ?: ""
-                        val city = components.find { "locality" in it.types }?.long_name ?: ""
-                        val country = components.find { "country" in it.types }?.long_name ?: ""
-
-                        onValueChange(
-                            incident.copy(
-                                street = street,
-                                houseNumber = houseNumber,
-                                zipcode = zipcode,
-                                city = city,
-                                country = country
-                            )
-                        )
-                    }
-                }
-
-            } catch (e: Exception) {
-//                throw e
-                Toast.makeText(
-                    context,
-                    "Error: " + e.message,
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-    }
-}
-
-@Composable
 fun AddressFields(
     incident: Incident,
-    onValueChange: (Incident) -> Unit = {},
-    enabled: Boolean = true
+    coordinates: Pair<Double, Double>? = null,
+    onValueChange: (Incident) -> Unit = {}
 ) {
     Text(
         text = "Address",
         fontWeight = FontWeight.Bold
     )
+
+    if (coordinates != null) {
+        Text(text = "Coordinates: ${coordinates.first}, ${coordinates.second}")
+    } else {
+        Text(text = "Coordinates: unknown")
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth(),
@@ -429,9 +370,8 @@ fun AddressFields(
                 disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
             ),
             modifier = Modifier
-                .weight(1f / 12 * 7)
+                .weight(1f / 12 * 8)
                 .padding(end = 4.dp),
-            enabled = enabled,
             singleLine = true
         )
         OutlinedTextField(
@@ -448,9 +388,8 @@ fun AddressFields(
                 disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
             ),
             modifier = Modifier
-                .weight(1f / 12 * 5)
+                .weight(1f / 12 * 4)
                 .padding(start = 4.dp),
-            enabled = enabled,
             singleLine = true
         )
     }
@@ -473,9 +412,8 @@ fun AddressFields(
                 disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
             ),
             modifier = Modifier
-                .weight(1f / 12 * 5)
+                .weight(1f / 12 * 4)
                 .padding(end = 4.dp),
-            enabled = enabled,
             singleLine = true
         )
         OutlinedTextField(
@@ -492,9 +430,8 @@ fun AddressFields(
                 disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
             ),
             modifier = Modifier
-                .weight(1f / 12 * 7)
+                .weight(1f / 12 * 8)
                 .padding(start = 4.dp),
-            enabled = enabled,
             singleLine = true
         )
     }
@@ -511,7 +448,6 @@ fun AddressFields(
             unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
             disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
         ),
-        enabled = enabled,
         modifier = Modifier.fillMaxWidth(),
         singleLine = true
     )
@@ -541,7 +477,7 @@ fun EntryScreenPreview() {
                 )
             ),
             onSaveClick = {},
-            onIncidentValueChange = {}
+            onValueChange = {}
 //            navigateBack = {},
 //            onNavigateUp = {},
 //            loggedInUser = User(

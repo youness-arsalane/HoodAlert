@@ -222,7 +222,7 @@ fun Details(
             DetailsRow(
                 labelResID = R.string.latitude,
                 incidentDetail = if (incident.latitude != null) "%.6f".format(incident.latitude!! / 1.0)
-                else "Niet bekend",
+                else "Unknown",
                 modifier = Modifier.padding(
                     horizontal = 16.dp
                 )
@@ -230,7 +230,7 @@ fun Details(
             DetailsRow(
                 labelResID = R.string.longitude,
                 incidentDetail = if (incident.longitude != null) "%.6f".format(incident.longitude!! / 1.0)
-                else "Niet bekend",
+                else "Unknown",
                 modifier = Modifier.padding(
                     horizontal = 16.dp
                 )

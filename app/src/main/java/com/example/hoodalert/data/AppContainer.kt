@@ -15,7 +15,7 @@ interface AppContainer {
     val userSessionsRepository: UserSessionsRepository
 }
 
-class AppDataContainer(private val context: Context) : AppContainer {
+class AppDataContainer(val context: Context) : AppContainer {
     override val communitiesRepository = CommunitiesRepository(
         HoodAlertDatabase.DatabaseInstance.getInstance(context).communityDao()
     )

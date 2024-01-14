@@ -44,7 +44,7 @@ fun EditScreen(
     ) { innerPadding ->
         EntryBody(
             incidentUiState = viewModel.incidentUiState,
-            onIncidentValueChange = { viewModel.updateUiState(it) },
+            onValueChange = { viewModel.updateUiState(it) },
             onSaveClick = {
                 coroutineScope.launch {
                     viewModel.updateIncident()
