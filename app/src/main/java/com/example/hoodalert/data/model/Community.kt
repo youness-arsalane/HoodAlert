@@ -1,23 +1,17 @@
 package com.example.hoodalert.data.model
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import java.util.Date
+import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
+import kotlinx.datetime.LocalDateTime
 
-@Entity(
-    tableName = "communities"
-)
+@Serializable
 data class Community(
-    @PrimaryKey(autoGenerate = true)
+    @SerializedName("id")
     var id: Int,
-
-    @ColumnInfo(name = "name")
+    @SerializedName("name")
     var name: String,
-
-    @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
-    var createdAt: Date,
-
-    @ColumnInfo(name = "updated_at", defaultValue = "CURRENT_TIMESTAMP")
-    var updatedAt: Date
+    @SerializedName("createdAt")
+    var createdAt: LocalDateTime,
+    @SerializedName("updatedAt")
+    var updatedAt: LocalDateTime
 )

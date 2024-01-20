@@ -1,20 +1,46 @@
 package com.example.hoodalert.data.repository
 
-import com.example.hoodalert.data.dao.UserSessionDao
 import com.example.hoodalert.data.model.UserSession
-import kotlinx.coroutines.flow.Flow
+import com.example.hoodalert.data.retrofit.UserSessionsApiService
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
-class UserSessionsRepository(private val userSessionDao: UserSessionDao) {
-    fun getAllUserSessionsStream(): Flow<List<UserSession>> = userSessionDao.getAllUserSessions()
+class UserSessionsRepository(private val userSessionsApiService: UserSessionsApiService) {
+    private val _userSessions = MutableStateFlow<List<UserSession>>(emptyList())
+    val userSessions: StateFlow<List<UserSession>> = _userSessions
 
-    fun getUserSessionStream(id: Int): Flow<UserSession?> = userSessionDao.getUserSession(id)
+    private val _userSessionDetails = MutableStateFlow<UserSession?>(null)
+    val userSessionDetails: StateFlow<UserSession?> = _userSessionDetails.asStateFlow()
 
-    fun getUserSessionByToken(token: String): Flow<UserSession?> =
-        userSessionDao.getUserSessionByToken(token)
+    suspend fun getUserSessions(): List<UserSession> {
+        val userSessions = userSessionsApiService.getUserSessions()
+        _userSessions.value = userSessions
+        return userSessions
+    }
 
-    suspend fun insertUserSession(userSession: UserSession) = userSessionDao.insert(userSession)
+    suspend fun getUserSession(id: Int): UserSession {
+        val userSession = userSessionsApiService.getUserSession(id)
+        _userSessionDetails.value = userSession
+        return userSession
+    }
 
-    suspend fun updateUserSession(userSession: UserSession) = userSessionDao.update(userSession)
+    suspend fun insertUserSession(userSession: UserSession): UserSession {
+        val result = userSessionsApiService.insertUserSession(userSession)
+        _userSessions.value = _userSessions.value + result
+        _userSessionDetails.value = result
+        return result
+    }
 
-    suspend fun deleteUserSession(userSession: UserSession) = userSessionDao.delete(userSession)
+    suspend fun updateUserSession(userSession: UserSession): UserSession {
+        val result = userSessionsApiService.updateUserSession(userSession.id, userSession)
+        _userSessions.value = _userSessions.value.map { if (it.id == result.id) result else it }
+        _userSessionDetails.value = result
+        return result
+    }
+
+    suspend fun deleteUserSession(userSession: UserSession) {
+        userSessionsApiService.deleteUserSession(userSession.id)
+        _userSessions.value = _userSessions.value.filter { it.id != userSession.id }
+    }
 }

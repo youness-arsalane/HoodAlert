@@ -4,7 +4,7 @@ class PasswordState :
     TextFieldState(validator = ::isPasswordValid, errorFor = ::passwordValidationError)
 
 private fun isPasswordValid(password: String): Boolean {
-    return password.length > 3
+    return password.isNotEmpty()
 }
 
 @Suppress("UNUSED_PARAMETER")

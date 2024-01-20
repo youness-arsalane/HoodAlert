@@ -8,8 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hoodalert.data.AppDataContainer
 import com.example.hoodalert.ui.screens.communities.CommunityEditDestination
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class CommunityEditViewModel(
@@ -24,9 +22,7 @@ class CommunityEditViewModel(
 
     init {
         viewModelScope.launch {
-            communityUiState = appContainer.communitiesRepository.getCommunityStream(communityId)
-                .filterNotNull()
-                .first()
+            communityUiState = appContainer.communitiesRepository.getCommunity(communityId)
                 .toCommunityUiState(true)
         }
     }

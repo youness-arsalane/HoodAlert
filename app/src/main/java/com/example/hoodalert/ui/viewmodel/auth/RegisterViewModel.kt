@@ -7,7 +7,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.hoodalert.data.AppDataContainer
 import com.example.hoodalert.data.model.User
-import java.util.Date
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 class RegisterViewModel(private val appContainer: AppDataContainer) : ViewModel() {
     var userUiState by mutableStateOf(UserUiState())
@@ -53,8 +55,8 @@ fun UserDetails.toUser(): User = User(
     firstName = firstName,
     lastName = lastName,
     password = password,
-    createdAt = Date(),
-    updatedAt = Date()
+    createdAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+    updatedAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 )
 
 fun User.toUserUiState(isEntryValid: Boolean = false): UserUiState = UserUiState(

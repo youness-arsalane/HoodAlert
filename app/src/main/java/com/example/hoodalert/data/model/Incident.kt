@@ -1,70 +1,37 @@
 package com.example.hoodalert.data.model
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
-import java.util.Date
+import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
+import kotlinx.datetime.LocalDateTime
 
-@Entity(
-    tableName = "incidents",
-    foreignKeys = [
-        ForeignKey(
-            entity = Community::class,
-            parentColumns = arrayOf("id"),
-            childColumns = arrayOf("community_id"),
-            onUpdate = ForeignKey.CASCADE,
-            onDelete = ForeignKey.CASCADE
-        ),
-        ForeignKey(
-            entity = User::class,
-            parentColumns = arrayOf("id"),
-            childColumns = arrayOf("user_id"),
-            onUpdate = ForeignKey.CASCADE,
-            onDelete = ForeignKey.CASCADE
-        )
-    ]
-)
+@Serializable
 data class Incident(
-    @PrimaryKey(autoGenerate = true)
+    @SerializedName("id")
     var id: Int,
-
-    @ColumnInfo(name = "community_id")
+    @SerializedName("communityId")
     var communityId: Int,
-
-    @ColumnInfo(name = "user_id")
+    @SerializedName("userId")
     var userId: Int,
-
-    @ColumnInfo(name = "title")
+    @SerializedName("title")
     var title: String,
-
-    @ColumnInfo(name = "description")
+    @SerializedName("description")
     var description: String,
-
-    @ColumnInfo(name = "street")
+    @SerializedName("street")
     var street: String,
-
-    @ColumnInfo(name = "houseNumber")
+    @SerializedName("houseNumber")
     var houseNumber: String,
-
-    @ColumnInfo(name = "zipcode")
+    @SerializedName("zipcode")
     var zipcode: String,
-
-    @ColumnInfo(name = "city")
+    @SerializedName("city")
     var city: String,
-
-    @ColumnInfo(name = "country")
+    @SerializedName("country")
     var country: String,
-
-    @ColumnInfo(name = "latitude")
+    @SerializedName("latitude")
     var latitude: Double?,
-
-    @ColumnInfo(name = "longitude")
+    @SerializedName("longitude")
     var longitude: Double?,
-
-    @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
-    var createdAt: Date,
-
-    @ColumnInfo(name = "updated_at", defaultValue = "CURRENT_TIMESTAMP")
-    var updatedAt: Date,
+    @SerializedName("createdAt")
+    var createdAt: LocalDateTime,
+    @SerializedName("updatedAt")
+    var updatedAt: LocalDateTime
 )

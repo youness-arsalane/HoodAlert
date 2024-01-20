@@ -11,7 +11,8 @@ import kotlinx.coroutines.flow.stateIn
 
 class MapViewModel(private val appContainer: AppDataContainer) : ViewModel() {
     val mapUiState: StateFlow<MapUiState> =
-        appContainer.incidentsRepository.getAllIncidentsStream().map { MapUiState(it) }
+        appContainer.incidentsRepository.incidents
+            .map { MapUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),

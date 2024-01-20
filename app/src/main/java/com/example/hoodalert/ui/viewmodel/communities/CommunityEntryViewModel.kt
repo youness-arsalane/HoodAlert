@@ -8,7 +8,9 @@ import androidx.lifecycle.ViewModel
 import com.example.hoodalert.data.AppDataContainer
 import com.example.hoodalert.data.model.Community
 import com.example.hoodalert.data.model.CommunityUser
-import java.util.Date
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 class CommunityEntryViewModel(
     private val appContainer: AppDataContainer
@@ -29,17 +31,17 @@ class CommunityEntryViewModel(
         }
 
         val community = communityUiState.communityDetails.toCommunity()
-        val communityId = appContainer.communitiesRepository.insertCommunity(community)
+        val insertedCommunity = appContainer.communitiesRepository.insertCommunity(community)
 
         val loggedInUser = appContainer.usersRepository.getLoggedInUser()
 
         val communityUser = CommunityUser(
             id = 0,
-            communityId = communityId,
+            communityId = insertedCommunity.id,
             userId = loggedInUser.id,
             isAdmin = true,
-            createdAt = Date(),
-            updatedAt = Date()
+            createdAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+            updatedAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         )
 
         appContainer.communityUsersRepository.insertCommunityUser(communityUser)
@@ -65,8 +67,8 @@ data class CommunityDetails(
 fun CommunityDetails.toCommunity(): Community = Community(
     id = id,
     name = name,
-    createdAt = Date(),
-    updatedAt = Date()
+    createdAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+    updatedAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 )
 
 fun Community.toCommunityUiState(isEntryValid: Boolean = false): CommunityUiState {

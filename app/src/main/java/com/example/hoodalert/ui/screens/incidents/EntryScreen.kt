@@ -55,7 +55,9 @@ import com.example.hoodalert.ui.viewmodel.incidents.IncidentUiState
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.launch
-import java.util.Date
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 
 object IncidentEntryDestination : NavigationDestination {
@@ -472,8 +474,8 @@ fun EntryScreenPreview() {
                     country = "",
                     latitude = null,
                     longitude = null,
-                    createdAt = Date(),
-                    updatedAt = Date()
+                    createdAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+                    updatedAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                 )
             ),
             onSaveClick = {},
@@ -486,8 +488,8 @@ fun EntryScreenPreview() {
 //                firstName = "Test",
 //                lastName = "Test",
 //                password = "",
-//                createdAt = Date(),
-//                updatedAt = Date(),
+//                createdAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+//                updatedAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
 //            )
         )
     }

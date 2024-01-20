@@ -1,36 +1,19 @@
 package com.example.hoodalert.data.model
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
-import java.util.Date
+import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
+import kotlinx.datetime.LocalDateTime
 
-@Entity(
-    tableName = "user_sessions",
-    foreignKeys = [
-        ForeignKey(
-            entity = User::class,
-            parentColumns = arrayOf("id"),
-            childColumns = arrayOf("user_id"),
-            onUpdate = ForeignKey.CASCADE,
-            onDelete = ForeignKey.CASCADE
-        )
-    ]
-)
+@Serializable
 data class UserSession(
-    @PrimaryKey(autoGenerate = true)
+    @SerializedName("id")
     var id: Int,
-
-    @ColumnInfo(name = "user_id")
+    @SerializedName("userId")
     var userId: Int,
-
-    @ColumnInfo(name = "token")
+    @SerializedName("token")
     var token: String,
-
-    @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
-    var createdAt: Date,
-
-    @ColumnInfo(name = "updated_at", defaultValue = "CURRENT_TIMESTAMP")
-    var updatedAt: Date
+    @SerializedName("createdAt")
+    var createdAt: LocalDateTime,
+    @SerializedName("updatedAt")
+    var updatedAt: LocalDateTime
 )

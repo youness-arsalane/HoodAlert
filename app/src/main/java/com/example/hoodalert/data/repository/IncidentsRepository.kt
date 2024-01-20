@@ -1,21 +1,50 @@
 package com.example.hoodalert.data.repository
 
-import com.example.hoodalert.data.dao.IncidentDao
 import com.example.hoodalert.data.model.Community
 import com.example.hoodalert.data.model.Incident
-import kotlinx.coroutines.flow.Flow
+import com.example.hoodalert.data.retrofit.IncidentsApiService
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
-class IncidentsRepository(private val incidentDao: IncidentDao) {
-    fun getAllIncidentsStream(): Flow<List<Incident>> = incidentDao.getAllIncidents()
+class IncidentsRepository(private val incidentsApiService: IncidentsApiService) {
+    private val _incidents = MutableStateFlow<List<Incident>>(emptyList())
+    val incidents: StateFlow<List<Incident>> = _incidents
 
-    fun getIncidentStream(id: Int): Flow<Incident?> = incidentDao.getIncident(id)
+    private val _incidentDetails = MutableStateFlow<Incident?>(null)
+    val incidentDetails: StateFlow<Incident?> = _incidentDetails.asStateFlow()
 
-    suspend fun insertIncident(incident: Incident) = incidentDao.insert(incident)
+    suspend fun getIncidents(): List<Incident> {
+        val incidents = incidentsApiService.getIncidents()
+        _incidents.value = incidents
+        return incidents
+    }
 
-    suspend fun updateIncident(incident: Incident) = incidentDao.update(incident)
+    suspend fun findByCommunity(community: Community): List<Incident> =
+        incidentsApiService.findByCommunityId(community.id)
 
-    suspend fun deleteIncident(incident: Incident) = incidentDao.delete(incident)
+    suspend fun getIncident(id: Int): Incident {
+        val incident = incidentsApiService.getIncident(id)
+        _incidentDetails.value = incident
+        return incident
+    }
 
-    fun findByCommunity(community: Community): Flow<List<Incident>> =
-        incidentDao.findByCommunityId(community.id)
+    suspend fun insertIncident(incident: Incident): Incident {
+        val result = incidentsApiService.insertIncident(incident)
+        _incidents.value = _incidents.value + result
+        _incidentDetails.value = result
+        return result
+    }
+
+    suspend fun updateIncident(incident: Incident): Incident {
+        val result = incidentsApiService.updateIncident(incident.id, incident)
+        _incidents.value = _incidents.value.map { if (it.id == result.id) result else it }
+        _incidentDetails.value = result
+        return result
+    }
+
+    suspend fun deleteIncident(incident: Incident) {
+        incidentsApiService.deleteIncident(incident.id)
+        _incidents.value = _incidents.value.filter { it.id != incident.id }
+    }
 }

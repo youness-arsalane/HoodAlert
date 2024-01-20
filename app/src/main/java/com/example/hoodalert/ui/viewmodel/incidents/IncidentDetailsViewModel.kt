@@ -10,11 +10,12 @@ import com.example.hoodalert.data.model.User
 import com.example.hoodalert.ui.screens.incidents.IncidentDetailsDestination
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import java.util.Date
+import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 class IncidentDetailsViewModel(
     savedStateHandle: SavedStateHandle,
@@ -22,25 +23,31 @@ class IncidentDetailsViewModel(
 ) : ViewModel() {
     private val incidentId: Int =
         checkNotNull(savedStateHandle[IncidentDetailsDestination.incidentIdArg])
-    private val incidentStream = appContainer.incidentsRepository.getIncidentStream(incidentId)
-        .filterNotNull()
 
-    val uiState: StateFlow<IncidentDetailsUiState> = incidentStream
-        .map {
-            IncidentDetailsUiState(
-                incident = it,
-                community = appContainer.communitiesRepository.getCommunityStream(incidentStream.first().communityId)
-                    .filterNotNull()
-                    .first(),
-                user = appContainer.usersRepository.getUserStream(incidentStream.first().userId)
-                    .filterNotNull()
-                    .first()
+    val uiState: StateFlow<IncidentDetailsUiState> =
+        appContainer.incidentsRepository.incidentDetails
+            .map {
+                if (it !== null) {
+                    IncidentDetailsUiState(
+                        incident = it,
+                        community = appContainer.communitiesRepository.getCommunity(it.communityId),
+                        user = appContainer.usersRepository.getUser(it.userId)
+                    )
+                } else {
+                    IncidentDetailsUiState()
+                }
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = IncidentDetailsUiState()
             )
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-            initialValue = IncidentDetailsUiState()
-        )
+
+    init {
+        viewModelScope.launch {
+            appContainer.incidentsRepository.getIncident(incidentId)
+        }
+    }
 
     suspend fun deleteIncident() {
         appContainer.incidentsRepository.deleteIncident(uiState.value.incident)
@@ -65,8 +72,8 @@ data class IncidentDetailsUiState(
         country = "",
         latitude = null,
         longitude = null,
-        createdAt = Date(),
-        updatedAt = Date()
+        createdAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+        updatedAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     ),
     var community: Community? = null,
     var user: User? = null,

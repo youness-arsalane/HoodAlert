@@ -57,7 +57,9 @@ import com.example.hoodalert.ui.viewmodel.communities.CommunityDetailsViewModel
 import com.example.hoodalert.ui.viewmodel.communities.getIncidents
 import com.example.hoodalert.ui.viewmodel.communities.toCommunity
 import kotlinx.coroutines.launch
-import java.util.Date
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 object CommunityDetailsDestination : NavigationDestination {
     override val route = "community_details"
@@ -149,8 +151,8 @@ fun DetailsScreen(
                     communityId = uiState.value.communityDetails.toCommunity().id,
                     userId = loggedInUser.id,
                     isAdmin = false,
-                    createdAt = Date(),
-                    updatedAt = Date()
+                    createdAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+                    updatedAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                 )
 
                 coroutineScope.launch {
@@ -346,8 +348,8 @@ fun DetailsScreenPreview() {
                 firstName = "Test",
                 lastName = "Test",
                 password = "",
-                createdAt = Date(),
-                updatedAt = Date(),
+                createdAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+                updatedAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
             ),
             navigateBack = { /*TODO*/ })
     }

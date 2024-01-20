@@ -2,7 +2,6 @@ package com.example.hoodalert.ui.viewmodel.incidents
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -15,12 +14,12 @@ import com.example.hoodalert.data.model.Incident
 import com.example.hoodalert.data.model.User
 import com.example.hoodalert.data.service.GeocodingService
 import com.example.hoodalert.ui.screens.communities.CommunityEditDestination
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import java.util.Date
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 class IncidentEntryViewModel(
     savedStateHandle: SavedStateHandle,
@@ -36,9 +35,7 @@ class IncidentEntryViewModel(
         viewModelScope.launch {
             if (communityId != 0) {
                 incidentUiState.community =
-                    appContainer.communitiesRepository.getCommunityStream(communityId)
-                        .filterNotNull()
-                        .first()
+                    appContainer.communitiesRepository.getCommunity(communityId)
             }
         }
     }
@@ -80,13 +77,11 @@ class IncidentEntryViewModel(
     suspend fun loadAddressByCoordinates(
         coordinates: Pair<Double, Double>
     ) {
-        Log.d("HOOD_ALERT_DEBUG", "VM => loadAddressByCoordinates()")
-
         val context = appContainer.context
         val incident = incidentUiState.incident
 
-        val app: ApplicationInfo = context.getPackageManager()
-            .getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA)
+        val app: ApplicationInfo = context.packageManager
+            .getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
         val bundle = app.metaData
 
         val apiKey = bundle.getString("com.google.android.geo.API_KEY").toString()
@@ -135,13 +130,11 @@ class IncidentEntryViewModel(
         country: String,
         onFound: (IncidentUiState) -> Unit = {}
     ) {
-        Log.d("HOOD_ALERT_DEBUG", "VM => loadCoordinatesByAddress()")
-
         val context = appContainer.context
         val incident = incidentUiState.incident
 
-        val app: ApplicationInfo = context.getPackageManager()
-            .getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA)
+        val app: ApplicationInfo = context.packageManager
+            .getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
         val bundle = app.metaData
 
         val apiKey = bundle.getString("com.google.android.geo.API_KEY").toString()
@@ -158,7 +151,6 @@ class IncidentEntryViewModel(
         )
 
         val location = response.results.firstOrNull()?.geometry?.location
-        Log.d("HOOD_ALERT_DEBUG", "Coordinates => $location")
 
         if (location != null) {
             updateUiState(
@@ -202,8 +194,8 @@ fun emptyIncident(): Incident {
         country = "",
         latitude = null,
         longitude = null,
-        createdAt = Date(),
-        updatedAt = Date()
+        createdAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+        updatedAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     )
 }
 

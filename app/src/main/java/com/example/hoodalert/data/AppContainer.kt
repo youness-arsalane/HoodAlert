@@ -6,6 +6,7 @@ import com.example.hoodalert.data.repository.CommunityUsersRepository
 import com.example.hoodalert.data.repository.IncidentsRepository
 import com.example.hoodalert.data.repository.UserSessionsRepository
 import com.example.hoodalert.data.repository.UsersRepository
+import com.example.hoodalert.data.retrofit.RetrofitBuilder
 
 interface AppContainer {
     val communitiesRepository: CommunitiesRepository
@@ -16,20 +17,14 @@ interface AppContainer {
 }
 
 class AppDataContainer(val context: Context) : AppContainer {
-    override val communitiesRepository = CommunitiesRepository(
-        HoodAlertDatabase.DatabaseInstance.getInstance(context).communityDao()
-    )
-    override val communityUsersRepository = CommunityUsersRepository(
-        HoodAlertDatabase.DatabaseInstance.getInstance(context).communityUserDao()
-    )
-    override val incidentsRepository = IncidentsRepository(
-        HoodAlertDatabase.DatabaseInstance.getInstance(context).incidentDao()
-    )
-    override val usersRepository = UsersRepository(
-        HoodAlertDatabase.DatabaseInstance.getInstance(context).userDao(),
-        context
-    )
-    override val userSessionsRepository = UserSessionsRepository(
-        HoodAlertDatabase.DatabaseInstance.getInstance(context).userSessionDao()
-    )
+    override val communitiesRepository =
+        CommunitiesRepository(RetrofitBuilder.communitiesApiService)
+    override val communityUsersRepository =
+        CommunityUsersRepository(RetrofitBuilder.communityUsersApiService)
+    override val incidentsRepository =
+        IncidentsRepository(RetrofitBuilder.incidentsApiService)
+    override val usersRepository =
+        UsersRepository(RetrofitBuilder.usersApiService, context)
+    override val userSessionsRepository =
+        UserSessionsRepository(RetrofitBuilder.userSessionsApiService)
 }

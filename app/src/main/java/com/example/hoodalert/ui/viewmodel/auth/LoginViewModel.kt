@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import com.example.hoodalert.data.AppDataContainer
 import com.example.hoodalert.data.model.User
 import com.example.hoodalert.data.model.UserSession
-import java.util.Date
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 class LoginViewModel(private val appContainer: AppDataContainer) : ViewModel() {
     suspend fun login(
@@ -13,13 +15,12 @@ class LoginViewModel(private val appContainer: AppDataContainer) : ViewModel() {
         onLoginSuccess: (user: User) -> Unit,
         onLoginFailed: () -> Unit = {},
     ) {
+        val user = appContainer.usersRepository.getUserByEmail(email)
 
-        appContainer.usersRepository.getUserByEmail(email).collect { user ->
-            if (user != null && user.password == password) {
-                onLoginSuccess(user)
-            } else {
-                onLoginFailed()
-            }
+        if (user != null && user.password == password) {
+            onLoginSuccess(user)
+        } else {
+            onLoginFailed()
         }
     }
 
@@ -35,8 +36,8 @@ class LoginViewModel(private val appContainer: AppDataContainer) : ViewModel() {
             id = 0,
             userId = user.id,
             token = token,
-            createdAt = Date(),
-            updatedAt = Date()
+            createdAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+            updatedAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         )
 
         appContainer.userSessionsRepository.insertUserSession(userSession)

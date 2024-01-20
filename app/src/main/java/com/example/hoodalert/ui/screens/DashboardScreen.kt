@@ -35,7 +35,9 @@ import com.example.hoodalert.ui.navigation.NavigationDestination
 import com.example.hoodalert.ui.screens.communities.CommunityListDestination
 import com.example.hoodalert.ui.theme.HoodAlertTheme
 import com.example.hoodalert.util.supportWideScreen
-import java.util.Date
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 object DashboardDestination : NavigationDestination {
     override val route = "dashboard"
@@ -156,8 +158,8 @@ fun DashboardScreenPreview() {
                 firstName = "Test",
                 lastName = "Test",
                 password = "",
-                createdAt = Date(),
-                updatedAt = Date(),
+                createdAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+                updatedAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
             ),
             navigateToMap = {},
             onLogout = {}

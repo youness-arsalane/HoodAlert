@@ -1,39 +1,71 @@
 package com.example.hoodalert.data.repository
 
 import android.content.Context
-import com.example.hoodalert.data.HoodAlertDatabase
 import com.example.hoodalert.data.auth.SharedPreferencesManager
-import com.example.hoodalert.data.dao.UserDao
 import com.example.hoodalert.data.model.User
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
+import com.example.hoodalert.data.retrofit.RetrofitBuilder
+import com.example.hoodalert.data.retrofit.UserSessionsApiService
+import com.example.hoodalert.data.retrofit.UsersApiService
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
-class UsersRepository(private val userDao: UserDao, private val context: Context) {
-    fun getAllUsersStream(): Flow<List<User>> = userDao.getAllUsers()
+class UsersRepository(private val usersApiService: UsersApiService, private val context: Context) {
+    private val _users = MutableStateFlow<List<User>>(emptyList())
+    val users: StateFlow<List<User>> = _users
 
-    fun getUserStream(id: Int): Flow<User?> = userDao.getUser(id)
+    private val _userDetails = MutableStateFlow<User?>(null)
+    val userDetails: StateFlow<User?> = _userDetails.asStateFlow()
 
-    fun getUserByEmail(email: String): Flow<User?> = userDao.getUserByEmail(email)
+    suspend fun getUsers(): List<User> {
+        val users = usersApiService.getUsers()
+        _users.value = users
+        return users
+    }
 
-    suspend fun insertUser(user: User) = userDao.insert(user)
+    suspend fun getUser(id: Int): User {
+        val user = usersApiService.getUser(id)
+        _userDetails.value = user
+        return user
+    }
 
-    suspend fun updateUser(user: User) = userDao.update(user)
+    suspend fun getUserByEmail(email: String): User {
+        val user = usersApiService.getUserByEmail(email)
+        _userDetails.value = user
+        return user
+    }
 
-    suspend fun deleteUser(user: User) = userDao.delete(user)
+    suspend fun insertUser(user: User): User {
+        val result = usersApiService.insertUser(user)
+        _users.value = _users.value + result
+        _userDetails.value = result
+        return result
+    }
+
+    suspend fun updateUser(user: User): User {
+        val result = usersApiService.updateUser(user.id, user)
+        _users.value = _users.value.map { if (it.id == result.id) result else it }
+        _userDetails.value = result
+        return result
+    }
+
+    suspend fun deleteUser(user: User) {
+        usersApiService.deleteUser(user.id)
+        _users.value = _users.value.filter { it.id != user.id }
+    }
 
     suspend fun getLoggedInUser(): User {
         val sharedPreferencesManager = SharedPreferencesManager(context)
         val token: String = sharedPreferencesManager.getUserToken().toString()
 
-        val userSessionDao =
-            HoodAlertDatabase.DatabaseInstance.getInstance(context).userSessionDao()
-        val userDao = HoodAlertDatabase.DatabaseInstance.getInstance(context).userDao()
+        val userSessionsApiService: UserSessionsApiService = RetrofitBuilder.userSessionsApiService
+        val userApiService: UsersApiService = RetrofitBuilder.usersApiService
 
         var loggedInUser: User? = null
 
-        val userSession = userSessionDao.getUserSessionByToken(token).firstOrNull()
+        val userSession = userSessionsApiService.getUserSessionByToken(token)
         if (userSession !== null) {
-            loggedInUser = userDao.getUser(userSession.userId).firstOrNull()
+            loggedInUser = userApiService.getUser(userSession.userId)
         }
 
         if (loggedInUser === null) {

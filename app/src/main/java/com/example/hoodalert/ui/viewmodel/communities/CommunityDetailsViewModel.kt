@@ -11,11 +11,9 @@ import com.example.hoodalert.data.model.User
 import com.example.hoodalert.ui.screens.communities.CommunityDetailsDestination
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class CommunityDetailsViewModel(
     savedStateHandle: SavedStateHandle,
@@ -26,28 +24,38 @@ class CommunityDetailsViewModel(
         checkNotNull(savedStateHandle[CommunityDetailsDestination.communityIdArg])
 
     val uiState: StateFlow<CommunityDetailsUiState> =
-        appContainer.communitiesRepository.getCommunityStream(communityId)
-            .filterNotNull()
+        appContainer.communitiesRepository.communityDetails
             .map {
-                CommunityDetailsUiState(communityDetails = it.toCommunityDetails())
-            }.stateIn(
+                if (it !== null) {
+                    CommunityDetailsUiState(communityDetails = it.toCommunityDetails())
+                } else {
+                    CommunityDetailsUiState()
+                }
+            }
+            .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = CommunityDetailsUiState()
             )
 
+    init {
+        viewModelScope.launch {
+            appContainer.communitiesRepository.getCommunity(communityId)
+        }
+    }
+
     suspend fun deleteCommunity() {
         appContainer.communitiesRepository.deleteCommunity(uiState.value.communityDetails.toCommunity())
     }
 
-    suspend fun findCommunityUser(loggedInUser: User): CommunityUser? {
+    suspend fun findCommunityUser(loggedInUser: User): CommunityUser {
         return appContainer.communityUsersRepository.findByCommunityAndUser(
             community = uiState.value.communityDetails.toCommunity(),
             user = loggedInUser
-        ).firstOrNull()
+        )
     }
 
-    suspend fun insertCommunityUser(communityUser: CommunityUser) {
+    suspend fun insertCommunityUser(communityUser: CommunityUser): CommunityUser {
         return appContainer.communityUsersRepository.insertCommunityUser(communityUser)
     }
 
@@ -55,7 +63,7 @@ class CommunityDetailsViewModel(
         return appContainer.communityUsersRepository.deleteCommunityUser(communityUser)
     }
 
-    fun getIncidents(community: Community) =
+    suspend fun getIncidents(community: Community) =
         appContainer.incidentsRepository.findByCommunity(community)
 
     companion object {
@@ -68,7 +76,7 @@ data class CommunityDetailsUiState(
 )
 
 suspend fun Community.getIncidents(communityDetailsViewModel: CommunityDetailsViewModel): List<Incident> {
-    return communityDetailsViewModel.getIncidents(this).first()
+    return communityDetailsViewModel.getIncidents(this)
 }
 
 //fun Community.getIncidents(communityDetailsViewModel: CommunityDetailsViewModel): List<Incident> {
