@@ -24,7 +24,7 @@ import com.example.hoodalert.ui.AppViewModelProvider
 import com.example.hoodalert.ui.components.HoodAlertTopAppBar
 import com.example.hoodalert.ui.navigation.NavigationDestination
 import com.example.hoodalert.ui.viewmodel.communities.CommunityDetails
-import com.example.hoodalert.ui.viewmodel.communities.CommunityEntryViewModel
+import com.example.hoodalert.ui.viewmodel.communities.CommunityFormViewModel
 import com.example.hoodalert.ui.viewmodel.communities.CommunityUiState
 import kotlinx.coroutines.launch
 
@@ -33,25 +33,34 @@ object CommunityEntryDestination : NavigationDestination {
     override val titleRes = R.string.community_entry_title
 }
 
+object CommunityEditDestination : NavigationDestination {
+    override val route = "community_edit"
+    override val titleRes = R.string.edit_community_title
+    const val communityIdArg = "communityId"
+    val routeWithArgs = "$route/{$communityIdArg}"
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EntryScreen(
+fun FormScreen(
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
     canNavigateBack: Boolean = true,
-    viewModel: CommunityEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: CommunityFormViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val coroutineScope = rememberCoroutineScope()
     Scaffold(
         topBar = {
             HoodAlertTopAppBar(
-                title = stringResource(CommunityEntryDestination.titleRes),
+                title =
+                if (viewModel.isNew()) stringResource(CommunityEntryDestination.titleRes)
+                else stringResource(CommunityEditDestination.titleRes),
                 canNavigateBack = canNavigateBack,
                 navigateUp = onNavigateUp
             )
         }
     ) { innerPadding ->
-        EntryBody(
+        FormBody(
             communityUiState = viewModel.communityUiState,
             onCommunityValueChange = { viewModel.updateUiState(it) },
             onSaveClick = {
@@ -69,7 +78,7 @@ fun EntryScreen(
 }
 
 @Composable
-fun EntryBody(
+fun FormBody(
     communityUiState: CommunityUiState,
     onCommunityValueChange: (CommunityDetails) -> Unit,
     onSaveClick: () -> Unit,
@@ -95,43 +104,8 @@ fun EntryBody(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InputForm(
-    communityDetails: CommunityDetails,
-    modifier: Modifier = Modifier,
-    onValueChange: (CommunityDetails) -> Unit = {},
-    enabled: Boolean = true
-) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        OutlinedTextField(
-            value = communityDetails.name,
-            onValueChange = { onValueChange(communityDetails.copy(name = it)) },
-            label = { Text(stringResource(R.string.name)) },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            ),
-            modifier = Modifier.fillMaxWidth(),
-            enabled = enabled,
-            singleLine = true
-        )
-        if (enabled) {
-            Text(
-                text = stringResource(R.string.required_fields),
-                modifier = Modifier.padding(start = 16.dp)
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun InputForm2(
     communityDetails: CommunityDetails,
     modifier: Modifier = Modifier,
     onValueChange: (CommunityDetails) -> Unit = {},
