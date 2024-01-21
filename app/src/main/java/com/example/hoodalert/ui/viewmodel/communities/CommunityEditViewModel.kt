@@ -23,7 +23,7 @@ class CommunityEditViewModel(
     init {
         viewModelScope.launch {
             communityUiState = appContainer.communitiesRepository.getCommunity(communityId)
-                .toCommunityUiState(true)
+                ?.toCommunityUiState(true) ?: throw Exception("Community not found")
         }
     }
 

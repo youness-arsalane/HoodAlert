@@ -1,6 +1,7 @@
 package com.example.hoodalert.data.repository
 
 import android.content.Context
+import android.util.Log
 import com.example.hoodalert.data.auth.SharedPreferencesManager
 import com.example.hoodalert.data.model.User
 import com.example.hoodalert.data.retrofit.RetrofitBuilder
@@ -23,16 +24,24 @@ class UsersRepository(private val usersApiService: UsersApiService, private val 
         return users
     }
 
-    suspend fun getUser(id: Int): User {
-        val user = usersApiService.getUser(id)
-        _userDetails.value = user
-        return user
+    suspend fun getUser(id: Int): User? {
+        return try {
+            val user = usersApiService.getUser(id)
+            _userDetails.value = user
+            return user
+        } catch (e: Exception) {
+            null
+        }
     }
 
-    suspend fun getUserByEmail(email: String): User {
-        val user = usersApiService.getUserByEmail(email)
-        _userDetails.value = user
-        return user
+    suspend fun getUserByEmail(email: String): User? {
+        return try {
+            val user = usersApiService.getUserByEmail(email)
+            _userDetails.value = user
+            return user
+        } catch (e: Exception) {
+            null
+        }
     }
 
     suspend fun insertUser(user: User): User {
@@ -63,9 +72,13 @@ class UsersRepository(private val usersApiService: UsersApiService, private val 
 
         var loggedInUser: User? = null
 
-        val userSession = userSessionsApiService.getUserSessionByToken(token)
-        if (userSession !== null) {
+        Log.d("HOOD_ALERT_DEBUG", "token: $token")
+        try {
+            val userSession = userSessionsApiService.getUserSessionByToken(token)
+            Log.d("HOOD_ALERT_DEBUG", "userSession: $userSession")
             loggedInUser = userApiService.getUser(userSession.userId)
+        } catch (_: Exception) {
+            Log.d("HOOD_ALERT_DEBUG", "userSession not found")
         }
 
         if (loggedInUser === null) {

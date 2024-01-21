@@ -7,6 +7,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface UsersApiService {
     @GET("/users")
@@ -15,8 +16,8 @@ interface UsersApiService {
     @GET("/users/{id}")
     suspend fun getUser(@Path("id") id: Int): User
 
-    @GET("/users/byEmail/{email}")
-    suspend fun getUserByEmail(@Path("email") email: String): User
+    @GET("/users")
+    suspend fun getUserByEmail(@Query("email") email: String): User
 
     @POST("/users")
     suspend fun insertUser(@Body user: User): User

@@ -7,6 +7,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface CommunityUsersApiService {
     @GET("/communityUsers")
@@ -15,10 +16,10 @@ interface CommunityUsersApiService {
     @GET("/communityUsers/{id}")
     suspend fun getCommunityUser(@Path("id") id: Int): CommunityUser
 
-    @GET("/communityUsers/byCommunityIdAndUserId/{communityId}/{userId}")
+    @GET("/communityUsers")
     suspend fun findByCommunityIdAndUserId(
-        @Path("communityId") communityId: Int,
-        @Path("userId") userId: Int
+        @Query("communityId") communityId: Int,
+        @Query("userId") userId: Int
     ): CommunityUser
 
     @POST("/communityUsers")

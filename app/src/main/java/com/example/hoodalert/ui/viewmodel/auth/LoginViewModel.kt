@@ -1,5 +1,6 @@
 package com.example.hoodalert.ui.viewmodel.auth
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.hoodalert.data.AppDataContainer
 import com.example.hoodalert.data.model.User
@@ -16,6 +17,8 @@ class LoginViewModel(private val appContainer: AppDataContainer) : ViewModel() {
         onLoginFailed: () -> Unit = {},
     ) {
         val user = appContainer.usersRepository.getUserByEmail(email)
+        Log.d("HOOD_ALERT_DEBUG", "email: " + user?.email.toString())
+        Log.d("HOOD_ALERT_DEBUG", "user: " + user?.toString())
 
         if (user != null && user.password == password) {
             onLoginSuccess(user)

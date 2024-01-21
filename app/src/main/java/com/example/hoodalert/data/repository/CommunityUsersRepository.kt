@@ -21,17 +21,25 @@ class CommunityUsersRepository(private val communityUsersApiService: CommunityUs
         return communityUsers
     }
 
-    suspend fun getCommunityUser(id: Int): CommunityUser {
-        val communityUser = communityUsersApiService.getCommunityUser(id)
-        _communityUserDetails.value = communityUser
-        return communityUser
+    suspend fun getCommunityUser(id: Int): CommunityUser? {
+        return try {
+            val communityUser = communityUsersApiService.getCommunityUser(id)
+            _communityUserDetails.value = communityUser
+            return communityUser
+        } catch(e: Exception) {
+            null
+        }
     }
 
-    suspend fun findByCommunityAndUser(community: Community, user: User): CommunityUser {
-        val communityUser =
-            communityUsersApiService.findByCommunityIdAndUserId(community.id, user.id)
-        _communityUserDetails.value = communityUser
-        return communityUser
+    suspend fun findByCommunityAndUser(community: Community, user: User): CommunityUser? {
+        return try {
+            val communityUser =
+                communityUsersApiService.findByCommunityIdAndUserId(community.id, user.id)
+            _communityUserDetails.value = communityUser
+            communityUser
+        } catch(e: Exception) {
+            null
+        }
     }
 
     suspend fun insertCommunityUser(communityUser: CommunityUser): CommunityUser {

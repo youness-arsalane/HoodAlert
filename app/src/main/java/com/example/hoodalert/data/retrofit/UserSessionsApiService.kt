@@ -7,6 +7,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface UserSessionsApiService {
     @GET("/userSessions")
@@ -15,8 +16,8 @@ interface UserSessionsApiService {
     @GET("/userSessions/{id}")
     suspend fun getUserSession(@Path("id") id: Int): UserSession
 
-    @GET("/userSessions/byToken/{token}")
-    suspend fun getUserSessionByToken(@Path("token") token: String): UserSession
+    @GET("/userSessions")
+    suspend fun getUserSessionByToken(@Query("token") token: String): UserSession
 
     @POST("/userSessions")
     suspend fun insertUserSession(@Body userSession: UserSession): UserSession

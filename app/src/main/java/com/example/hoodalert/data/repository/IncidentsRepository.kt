@@ -23,10 +23,14 @@ class IncidentsRepository(private val incidentsApiService: IncidentsApiService) 
     suspend fun findByCommunity(community: Community): List<Incident> =
         incidentsApiService.findByCommunityId(community.id)
 
-    suspend fun getIncident(id: Int): Incident {
-        val incident = incidentsApiService.getIncident(id)
-        _incidentDetails.value = incident
-        return incident
+    suspend fun getIncident(id: Int): Incident? {
+        return try {
+            val incident = incidentsApiService.getIncident(id)
+            _incidentDetails.value = incident
+            return incident
+        } catch(e: Exception) {
+            null
+        }
     }
 
     suspend fun insertIncident(incident: Incident): Incident {

@@ -1,5 +1,6 @@
 package com.example.hoodalert.data.repository
 
+import com.example.hoodalert.data.model.Incident
 import com.example.hoodalert.data.model.UserSession
 import com.example.hoodalert.data.retrofit.UserSessionsApiService
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,10 +20,14 @@ class UserSessionsRepository(private val userSessionsApiService: UserSessionsApi
         return userSessions
     }
 
-    suspend fun getUserSession(id: Int): UserSession {
-        val userSession = userSessionsApiService.getUserSession(id)
-        _userSessionDetails.value = userSession
-        return userSession
+    suspend fun getUserSession(id: Int): UserSession? {
+        return try {
+            val userSession = userSessionsApiService.getUserSession(id)
+            _userSessionDetails.value = userSession
+            return userSession
+        } catch(e: Exception) {
+            null
+        }
     }
 
     suspend fun insertUserSession(userSession: UserSession): UserSession {

@@ -7,13 +7,14 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface IncidentsApiService {
     @GET("/incidents")
     suspend fun getIncidents(): List<Incident>
 
-    @GET("/incidents/byCommunityId{communityId}")
-    suspend fun findByCommunityId(@Path("communityId") communityId: Int): List<Incident>
+    @GET("/incidents")
+    suspend fun findByCommunityId(@Query("communityId") communityId: Int): List<Incident>
 
     @GET("/incidents/{id}")
     suspend fun getIncident(@Path("id") id: Int): Incident

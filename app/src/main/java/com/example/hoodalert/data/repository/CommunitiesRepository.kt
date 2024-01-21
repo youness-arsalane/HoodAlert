@@ -19,10 +19,14 @@ class CommunitiesRepository(private val communitiesApiService: CommunitiesApiSer
         return communities
     }
 
-    suspend fun getCommunity(id: Int): Community {
-        val community = communitiesApiService.getCommunity(id)
-        _communityDetails.value = community
-        return community
+    suspend fun getCommunity(id: Int): Community? {
+        return try {
+            val community = communitiesApiService.getCommunity(id)
+            _communityDetails.value = community
+            return community
+        } catch(e: Exception) {
+            null
+        }
     }
 
     suspend fun insertCommunity(community: Community): Community {

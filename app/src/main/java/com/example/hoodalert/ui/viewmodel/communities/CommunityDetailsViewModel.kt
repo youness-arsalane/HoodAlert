@@ -48,7 +48,7 @@ class CommunityDetailsViewModel(
         appContainer.communitiesRepository.deleteCommunity(uiState.value.communityDetails.toCommunity())
     }
 
-    suspend fun findCommunityUser(loggedInUser: User): CommunityUser {
+    suspend fun findCommunityUser(loggedInUser: User): CommunityUser? {
         return appContainer.communityUsersRepository.findByCommunityAndUser(
             community = uiState.value.communityDetails.toCommunity(),
             user = loggedInUser

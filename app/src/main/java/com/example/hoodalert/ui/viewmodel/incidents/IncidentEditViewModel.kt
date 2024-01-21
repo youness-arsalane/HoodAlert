@@ -23,7 +23,7 @@ class IncidentEditViewModel(
 
     init {
         viewModelScope.launch {
-            val incident = appContainer.incidentsRepository.getIncident(incidentId)
+            val incident = appContainer.incidentsRepository.getIncident(incidentId) ?: throw Exception("Incident not found")
             val community = appContainer.communitiesRepository.getCommunity(incident.communityId)
             val user = appContainer.usersRepository.getUser(incident.userId)
 
