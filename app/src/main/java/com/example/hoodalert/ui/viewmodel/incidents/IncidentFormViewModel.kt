@@ -13,32 +13,45 @@ import com.example.hoodalert.data.model.Community
 import com.example.hoodalert.data.model.Incident
 import com.example.hoodalert.data.model.User
 import com.example.hoodalert.data.service.GeocodingService
-import com.example.hoodalert.ui.screens.communities.CommunityEditDestination
+import com.example.hoodalert.ui.screens.incidents.IncidentEditDestination
 import kotlinx.coroutines.launch
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import retrofit2.Retrofit
+import retrofit2.converter.moshi.MoshiConverterFactory
 
-class IncidentEntryViewModel(
+class IncidentFormViewModel(
     savedStateHandle: SavedStateHandle,
     private val appContainer: AppDataContainer
 ) : ViewModel() {
     var incidentUiState by mutableStateOf(IncidentUiState())
         private set
 
+    private val incidentId: Int? =
+        savedStateHandle[IncidentEditDestination.incidentIdArg]
+
     private val communityId: Int =
-        checkNotNull(savedStateHandle[CommunityEditDestination.communityIdArg])
+        checkNotNull(savedStateHandle[IncidentEditDestination.communityIdArg])
 
     init {
         viewModelScope.launch {
-            if (communityId != 0) {
-                incidentUiState.community =
-                    appContainer.communitiesRepository.getCommunity(communityId)
+            val community = appContainer.communitiesRepository.getCommunity(communityId)
+            incidentUiState.community = community
+
+            if (incidentId != null) {
+                val incident = appContainer.incidentsRepository.getIncident(incidentId)
+                    ?: throw Exception("Incident not found")
+                val user = appContainer.usersRepository.getUser(incident.userId)
+
+                incidentUiState = incident.toIncidentUiState(true)
+                incidentUiState.user = user
+                incidentUiState.community = community
             }
         }
     }
+
+    fun isNew(): Boolean = incidentId == null
 
     fun updateUiState(incident: Incident) {
         incidentUiState = IncidentUiState(
@@ -64,13 +77,21 @@ class IncidentEntryViewModel(
                 country = incident.country,
                 onFound = { incidentUiState ->
                     viewModelScope.launch {
-                        appContainer.incidentsRepository.insertIncident(incidentUiState.incident)
+                        if (isNew()) {
+                            appContainer.incidentsRepository.insertIncident(incidentUiState.incident)
+                        } else {
+                            appContainer.incidentsRepository.updateIncident(incidentUiState.incident)
+                        }
                     }
                 }
             )
 
         } else {
-            appContainer.incidentsRepository.insertIncident(incident)
+            if (isNew()) {
+                appContainer.incidentsRepository.insertIncident(incident)
+            } else {
+                appContainer.incidentsRepository.updateIncident(incident)
+            }
         }
     }
 

@@ -72,13 +72,10 @@ class UsersRepository(private val usersApiService: UsersApiService, private val 
 
         var loggedInUser: User? = null
 
-        Log.d("HOOD_ALERT_DEBUG", "token: $token")
         try {
             val userSession = userSessionsApiService.getUserSessionByToken(token)
-            Log.d("HOOD_ALERT_DEBUG", "userSession: $userSession")
             loggedInUser = userApiService.getUser(userSession.userId)
         } catch (_: Exception) {
-            Log.d("HOOD_ALERT_DEBUG", "userSession not found")
         }
 
         if (loggedInUser === null) {

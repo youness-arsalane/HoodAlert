@@ -59,7 +59,7 @@ object CommunityListDestination : NavigationDestination {
 fun ListScreen(
     loggedInUser: User?,
     navigateToCommunityEntry: () -> Unit,
-    navigateToCommunityUpdate: (Int) -> Unit,
+    navigateToCommunityUpdate: (communityId: Int) -> Unit,
     onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CommunityListViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -111,7 +111,7 @@ private fun ListBody(
     loggedInUser: User,
     viewModel: CommunityListViewModel,
     communityList: List<Community>,
-    onCommunityClick: (Int) -> Unit,
+    onCommunityClick: (communityId: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(

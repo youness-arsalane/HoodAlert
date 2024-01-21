@@ -17,8 +17,6 @@ class LoginViewModel(private val appContainer: AppDataContainer) : ViewModel() {
         onLoginFailed: () -> Unit = {},
     ) {
         val user = appContainer.usersRepository.getUserByEmail(email)
-        Log.d("HOOD_ALERT_DEBUG", "email: " + user?.email.toString())
-        Log.d("HOOD_ALERT_DEBUG", "user: " + user?.toString())
 
         if (user != null && user.password == password) {
             onLoginSuccess(user)

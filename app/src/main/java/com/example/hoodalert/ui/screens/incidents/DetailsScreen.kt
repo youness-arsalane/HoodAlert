@@ -47,22 +47,21 @@ import kotlinx.coroutines.launch
 object IncidentDetailsDestination : NavigationDestination {
     override val route = "incident_details"
     override val titleRes = R.string.incident_detail_title
+    const val communityIdArg = "communityId"
     const val incidentIdArg = "incidentId"
-    val routeWithArgs = "$route/{$incidentIdArg}"
+    val routeWithArgs = "$route/{$communityIdArg}/{$incidentIdArg}"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailsScreen(
-    navigateToEditIncident: (Int) -> Unit,
+    navigateToEditIncident: (communityId: Int, incidentId: Int) -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: IncidentDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState = viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-
-    val incident = uiState.value.incident
 
     Scaffold(
         topBar = {
@@ -73,7 +72,7 @@ fun DetailsScreen(
             )
         }, floatingActionButton = {
             FloatingActionButton(
-                onClick = { navigateToEditIncident(uiState.value.incident.id) },
+                onClick = { navigateToEditIncident(uiState.value.community!!.id, uiState.value.incident.id) },
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.padding(20.dp)
 

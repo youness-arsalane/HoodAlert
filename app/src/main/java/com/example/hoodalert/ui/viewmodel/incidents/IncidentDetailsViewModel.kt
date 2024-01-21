@@ -7,6 +7,7 @@ import com.example.hoodalert.data.AppDataContainer
 import com.example.hoodalert.data.model.Community
 import com.example.hoodalert.data.model.Incident
 import com.example.hoodalert.data.model.User
+import com.example.hoodalert.ui.screens.communities.CommunityDetailsDestination
 import com.example.hoodalert.ui.screens.incidents.IncidentDetailsDestination
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -21,6 +22,9 @@ class IncidentDetailsViewModel(
     savedStateHandle: SavedStateHandle,
     private val appContainer: AppDataContainer
 ) : ViewModel() {
+    private val communityId: Int =
+        checkNotNull(savedStateHandle[IncidentDetailsDestination.communityIdArg])
+
     private val incidentId: Int =
         checkNotNull(savedStateHandle[IncidentDetailsDestination.incidentIdArg])
 
