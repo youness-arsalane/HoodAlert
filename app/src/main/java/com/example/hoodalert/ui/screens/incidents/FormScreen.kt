@@ -50,7 +50,7 @@ import com.example.hoodalert.ui.AppViewModelProvider
 import com.example.hoodalert.ui.components.HoodAlertTopAppBar
 import com.example.hoodalert.ui.navigation.NavigationDestination
 import com.example.hoodalert.ui.theme.HoodAlertTheme
-import com.example.hoodalert.ui.viewmodel.incidents.IncidentEntryViewModel
+import com.example.hoodalert.ui.viewmodel.incidents.IncidentFormViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentUiState
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -65,15 +65,23 @@ object IncidentEntryDestination : NavigationDestination {
     val routeWithArgs = "${route}/{$communityIdArg}"
 }
 
+object IncidentEditDestination : NavigationDestination {
+    override val route = "incident_edit"
+    override val titleRes = R.string.edit_incident_title
+    const val communityIdArg = "communityId"
+    const val incidentIdArg = "incidentId"
+    val routeWithArgs = "$route/{${communityIdArg}}/{$incidentIdArg}"
+}
+
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EntryScreen(
+fun FormScreen(
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
     loggedInUser: User?,
     canNavigateBack: Boolean = true,
-    viewModel: IncidentEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: IncidentFormViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     if (loggedInUser == null) {
         return
@@ -141,7 +149,6 @@ fun EntryScreen(
                     !shouldShowPermissionRationale
                 ) {
                     shouldLaunchPermissionRationale = true
-//                    locationPermissionLauncher.launch(locationPermissions)
                 }
             }
             lifecycleOwner.lifecycle.addObserver(observer)
@@ -204,13 +211,15 @@ fun EntryScreen(
     Scaffold(
         topBar = {
             HoodAlertTopAppBar(
-                title = stringResource(IncidentEntryDestination.titleRes),
+                title =
+                if (viewModel.isNew()) stringResource(IncidentEntryDestination.titleRes)
+                else stringResource(IncidentEditDestination.titleRes),
                 canNavigateBack = canNavigateBack,
                 navigateUp = onNavigateUp
             )
         }
     ) { innerPadding ->
-        EntryBody(
+        FormBody(
             incidentUiState = viewModel.incidentUiState,
             onSaveClick = {
                 coroutineScope.launch {
@@ -251,7 +260,7 @@ fun EntryScreen(
 }
 
 @Composable
-fun EntryBody(
+fun FormBody(
     incidentUiState: IncidentUiState,
     onSaveClick: () -> Unit,
     onValueChange: (Incident) -> Unit,
@@ -347,6 +356,8 @@ fun AddressFields(
 
     if (coordinates != null) {
         Text(text = "Coordinates: ${coordinates.first}, ${coordinates.second}")
+    } else if (incident.latitude != null && incident.longitude != null) {
+        Text(text = "Coordinates: ${incident.latitude}, ${incident.longitude}")
     } else {
         Text(text = "Coordinates: unknown")
     }
@@ -455,9 +466,9 @@ fun AddressFields(
 
 @Preview
 @Composable
-fun EntryScreenPreview() {
+fun FormScreenPreview() {
     HoodAlertTheme {
-        EntryBody(
+        FormBody(
             incidentUiState = IncidentUiState(
                 incident = Incident(
                     id = 0,

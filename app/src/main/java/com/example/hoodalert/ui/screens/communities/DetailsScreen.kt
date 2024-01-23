@@ -69,9 +69,9 @@ object CommunityDetailsDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailsScreen(
-    navigateToEditCommunity: (Int) -> Unit,
+    navigateToEditCommunity: (communityId: Int) -> Unit,
     navigateToIncidentEntry: () -> Unit,
-    navigateToIncidentUpdate: (Int) -> Unit,
+    navigateToIncidentUpdate: (incidentId: Int) -> Unit,
     loggedInUser: User?,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -98,13 +98,13 @@ fun DetailsScreen(
                 canNavigateBack = true,
                 navigateUp = navigateBack,
                 actions = {
+                    IconButton(onClick = { navigateToEditCommunity(uiState.value.communityDetails.id) }) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = stringResource(R.string.edit_community_title)
+                        )
+                    }
                     if (communityUser != null && communityUser!!.isAdmin) {
-                        IconButton(onClick = { navigateToEditCommunity(uiState.value.communityDetails.id) }) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = stringResource(R.string.edit_community_title)
-                            )
-                        }
                         IconButton(
                             onClick = {
                                 coroutineScope.launch {
@@ -177,7 +177,7 @@ fun DetailsScreen(
 @Composable
 private fun DetailsBody(
     viewModel: CommunityDetailsViewModel,
-    navigateToIncidentUpdate: (Int) -> Unit,
+    navigateToIncidentUpdate: (incidentId: Int) -> Unit,
     communityDetailsUiState: CommunityDetailsUiState,
     modifier: Modifier = Modifier,
     communityUser: CommunityUser?,
@@ -238,7 +238,9 @@ private fun DetailsBody(
 
 @Composable
 private fun ListBody(
-    incidentList: List<Incident>, onIncidentClick: (Int) -> Unit, modifier: Modifier = Modifier
+    incidentList: List<Incident>,
+    onIncidentClick: (incidentId: Int) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

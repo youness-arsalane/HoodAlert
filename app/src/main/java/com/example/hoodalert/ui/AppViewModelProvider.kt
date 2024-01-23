@@ -10,12 +10,10 @@ import com.example.hoodalert.HoodAlertApplication
 import com.example.hoodalert.ui.viewmodel.auth.LoginViewModel
 import com.example.hoodalert.ui.viewmodel.auth.RegisterViewModel
 import com.example.hoodalert.ui.viewmodel.communities.CommunityDetailsViewModel
-import com.example.hoodalert.ui.viewmodel.communities.CommunityEditViewModel
-import com.example.hoodalert.ui.viewmodel.communities.CommunityEntryViewModel
+import com.example.hoodalert.ui.viewmodel.communities.CommunityFormViewModel
 import com.example.hoodalert.ui.viewmodel.communities.CommunityListViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentDetailsViewModel
-import com.example.hoodalert.ui.viewmodel.incidents.IncidentEditViewModel
-import com.example.hoodalert.ui.viewmodel.incidents.IncidentEntryViewModel
+import com.example.hoodalert.ui.viewmodel.incidents.IncidentFormViewModel
 import com.example.hoodalert.ui.viewmodel.incidents.IncidentListViewModel
 import com.example.inventory.ui.map.MapViewModel
 
@@ -30,14 +28,10 @@ object AppViewModelProvider {
         }
 
         initializer {
-            CommunityEditViewModel(
+            CommunityFormViewModel(
                 this.createSavedStateHandle(),
                 hoodAlertApplication().container
             )
-        }
-
-        initializer {
-            CommunityEntryViewModel(hoodAlertApplication().container)
         }
 
         initializer {
@@ -52,14 +46,7 @@ object AppViewModelProvider {
         }
 
         initializer {
-            IncidentEditViewModel(
-                this.createSavedStateHandle(),
-                hoodAlertApplication().container
-            )
-        }
-
-        initializer {
-            IncidentEntryViewModel(
+            IncidentFormViewModel(
                 this.createSavedStateHandle(),
                 hoodAlertApplication().container
             )

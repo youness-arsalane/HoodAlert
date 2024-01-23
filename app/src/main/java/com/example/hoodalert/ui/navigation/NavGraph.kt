@@ -34,12 +34,10 @@ import com.example.inventory.ui.map.MapDestination
 import com.example.inventory.ui.map.MapScreen
 import kotlinx.coroutines.launch
 import com.example.hoodalert.ui.screens.communities.DetailsScreen as CommunityDetailsScreen
-import com.example.hoodalert.ui.screens.communities.EditScreen as CommunityEditScreen
-import com.example.hoodalert.ui.screens.communities.EntryScreen as CommunityEntryScreen
+import com.example.hoodalert.ui.screens.communities.FormScreen as CommunityFormScreen
 import com.example.hoodalert.ui.screens.communities.ListScreen as CommunityListScreen
 import com.example.hoodalert.ui.screens.incidents.DetailsScreen as IncidentDetailsScreen
-import com.example.hoodalert.ui.screens.incidents.EditScreen as IncidentEditScreen
-import com.example.hoodalert.ui.screens.incidents.EntryScreen as IncidentEntryScreen
+import com.example.hoodalert.ui.screens.incidents.FormScreen as IncidentFormScreen
 import com.example.hoodalert.ui.screens.incidents.ListScreen as IncidentListScreen
 
 @Composable
@@ -104,7 +102,7 @@ fun HoodAlertNavHost(
             )
         }
         composable(route = CommunityEntryDestination.route) {
-            CommunityEntryScreen(
+            CommunityFormScreen(
                 navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() }
             )
@@ -118,9 +116,11 @@ fun HoodAlertNavHost(
             val communityId = it.arguments?.getInt(CommunityDetailsDestination.communityIdArg) ?: 0
 
             CommunityDetailsScreen(
-                navigateToEditCommunity = { navController.navigate("${CommunityEditDestination.route}/$it") },
+                navigateToEditCommunity = { navController.navigate("${CommunityEditDestination.route}/$communityId") },
                 navigateToIncidentEntry = { navController.navigate("${IncidentEntryDestination.route}/$communityId") },
-                navigateToIncidentUpdate = { navController.navigate("${IncidentDetailsDestination.route}/${it}") },
+                navigateToIncidentUpdate = { incidentId ->
+                    navController.navigate("${IncidentDetailsDestination.route}/$communityId/${incidentId}")
+                },
                 loggedInUser = loggedInUser,
                 navigateBack = { navController.navigateUp() }
             )
@@ -131,7 +131,7 @@ fun HoodAlertNavHost(
                 type = NavType.IntType
             })
         ) {
-            CommunityEditScreen(
+            CommunityFormScreen(
                 navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() }
             )
@@ -139,8 +139,8 @@ fun HoodAlertNavHost(
         composable(route = IncidentListDestination.route) {
             IncidentListScreen(
                 navigateToIncidentEntry = { navController.navigate(IncidentEntryDestination.route) },
-                navigateToIncidentUpdate = {
-                    navController.navigate("${IncidentDetailsDestination.route}/${it}")
+                navigateToIncidentUpdate = { communityId, incidentId ->
+                    navController.navigate("${IncidentDetailsDestination.route}/${communityId}/${incidentId}")
                 },
                 onNavigateUp = { navController.navigateUp() }
             )
@@ -151,7 +151,7 @@ fun HoodAlertNavHost(
                 type = NavType.IntType
             })
         ) {
-            IncidentEntryScreen(
+            IncidentFormScreen(
                 navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() },
                 loggedInUser = loggedInUser,
@@ -159,24 +159,37 @@ fun HoodAlertNavHost(
         }
         composable(
             route = IncidentDetailsDestination.routeWithArgs,
-            arguments = listOf(navArgument(IncidentDetailsDestination.incidentIdArg) {
-                type = NavType.IntType
-            })
+            arguments = listOf(
+                navArgument(IncidentEditDestination.communityIdArg) {
+                    type = NavType.IntType
+                },
+                navArgument(IncidentEditDestination.incidentIdArg) {
+                    type = NavType.IntType
+                }
+            )
         ) {
             IncidentDetailsScreen(
-                navigateToEditIncident = { navController.navigate("${IncidentEditDestination.route}/$it") },
+                navigateToEditIncident = { communityId, incidentId ->
+                    navController.navigate("${IncidentEditDestination.route}/$communityId/$incidentId")
+                },
                 navigateBack = { navController.navigateUp() }
             )
         }
         composable(
             route = IncidentEditDestination.routeWithArgs,
-            arguments = listOf(navArgument(IncidentEditDestination.incidentIdArg) {
-                type = NavType.IntType
-            })
+            arguments = listOf(
+                navArgument(IncidentEditDestination.communityIdArg) {
+                    type = NavType.IntType
+                },
+                navArgument(IncidentEditDestination.incidentIdArg) {
+                    type = NavType.IntType
+                }
+            )
         ) {
-            IncidentEditScreen(
+            IncidentFormScreen(
                 navigateBack = { navController.popBackStack() },
-                onNavigateUp = { navController.navigateUp() }
+                onNavigateUp = { navController.navigateUp() },
+                loggedInUser = loggedInUser
             )
         }
         composable(route = MapDestination.route) {

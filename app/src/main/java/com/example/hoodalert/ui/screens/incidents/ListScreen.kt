@@ -50,7 +50,7 @@ object IncidentListDestination : NavigationDestination {
 @Composable
 fun ListScreen(
     navigateToIncidentEntry: () -> Unit,
-    navigateToIncidentUpdate: (Int) -> Unit,
+    navigateToIncidentUpdate: (communityId: Int, incidentId: Int) -> Unit,
     onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: IncidentListViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -93,7 +93,9 @@ fun ListScreen(
 
 @Composable
 private fun ListBody(
-    incidentList: List<Incident>, onIncidentClick: (Int) -> Unit, modifier: Modifier = Modifier
+    incidentList: List<Incident>,
+    onIncidentClick: (communityId: Int, incidentId: Int) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -108,7 +110,7 @@ private fun ListBody(
         } else {
             HoodAlertList(
                 incidentList = incidentList,
-                onIncidentClick = { onIncidentClick(it.id) },
+                onIncidentClick = { onIncidentClick(it.communityId, it.id) },
                 modifier = Modifier.padding(horizontal = 8.dp)
             )
         }
@@ -117,7 +119,9 @@ private fun ListBody(
 
 @Composable
 private fun HoodAlertList(
-    incidentList: List<Incident>, onIncidentClick: (Incident) -> Unit, modifier: Modifier = Modifier
+    incidentList: List<Incident>,
+    onIncidentClick: (Incident) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier) {
         items(items = incidentList, key = { it.id }) { incident ->
@@ -158,6 +162,9 @@ private fun HoodAlertIncident(
 @Composable
 fun ListBodyEmptyListPreview() {
     HoodAlertTheme {
-        ListBody(listOf(), onIncidentClick = {})
+        ListBody(
+            listOf(),
+            onIncidentClick = { _, _ -> }
+        )
     }
 }
